@@ -126,13 +126,13 @@ class IntegerObj: public NumberObj
 
 		std::string ExternalRep();
 
-		friend bigInteger operator+ (IntegerObj, IntegerObj);
+		friend IntegerObj operator+ (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator- (IntegerObj, IntegerObj);
+		friend IntegerObj operator- (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator* (IntegerObj, IntegerObj);
+		friend IntegerObj operator* (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator/ (IntegerObj, IntegerObj);
+		friend RationalObj operator/ (IntegerObj, IntegerObj);
 		
 		friend bool operator< (IntegerObj, IntegerObj);
 		
@@ -153,11 +153,11 @@ class RationalObj: public NumberObj
 {
 	private:
 
-		bigRational value;
+		RationalObj value;
 
 	public:
 
-		RationalObj(bigRational i) : NumberObj(Rational), value(i) {}
+		RationalObj(RationalObj i) : NumberObj(Rational), value(i) {}
 
 		RationalObj(bigInteger a, bigInteger b) : NumberObj(Rational), value(a, b) {}
 
@@ -171,13 +171,13 @@ class RationalObj: public NumberObj
 
 		std::string ExternalRep();
 
-		friend bigRational operator+ (RationalObj, RationalObj);
+		friend RationalObj operator+ (RationalObj, RationalObj);
 		
-		friend bigRational operator- (RationalObj, RationalObj);
+		friend RationalObj operator- (RationalObj, RationalObj);
 		
-		friend bigRational operator* (RationalObj, RationalObj);
+		friend RationalObj operator* (RationalObj, RationalObj);
 		
-		friend bigRational operator/ (RationalObj, RationalObj);
+		friend RationalObj operator/ (RationalObj, RationalObj);
 		
 		friend bool operator< (RationalObj, RationalObj);
 		
@@ -213,13 +213,13 @@ class RealObj: public NumberObj
 
 		std::string ExternalRep();
 
-		friend bigReal operator+ (RealObj, RealObj);
+		friend RealObj operator+ (RealObj, RealObj);
 		
-		friend bigReal operator- (RealObj, RealObj);
+		friend RealObj operator- (RealObj, RealObj);
 		
-		friend bigReal operator* (RealObj, RealObj);
+		friend RealObj operator* (RealObj, RealObj);
 		
-		friend bigReal operator/ (RealObj, RealObj);
+		friend RealObj operator/ (RealObj, RealObj);
 		
 		friend bool operator< (RealObj, RealObj);
 		

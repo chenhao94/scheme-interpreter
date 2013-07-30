@@ -4,11 +4,12 @@
 
 This is the course project of Principle and Practice of Computer Algorithms 2013 (PPCA2013). The interpreter is designed to impterprete a subset of R5RS, including the basic function of this programming language.
 
-For simplicity, I tacity assume that the identifier defined by the users is the combination of *letters*, *numbers* and '\_'
-which not start with numbers, which means, the followings are illegal.
+For simplicity, I tacity assume that the identifier defined by the users is the combination of *letters*, *numbers* and *underscores*
+which start with letter, which means, the followings are illegal.
 
     (define a->b 1)
     (define 1a 2)
+	(define _a 3)
 
 And I suppose that users will never redefine the preserved keywords (e.g., *if* and *define*), e.g.,
     

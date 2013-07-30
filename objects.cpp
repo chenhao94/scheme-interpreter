@@ -165,6 +165,12 @@ T operator/ (T a, T b)
 	return ans;
 }
 
+RationalObj operator/ (IntegerObj a, IntegerObj b)
+{
+	RationalObj ans(a.value, b.value);
+	return ans;
+}
+
 template <class T>
 bool operator< (T a, T b)
 {
