@@ -22,6 +22,17 @@
 
 enum objType {Bool, Char, Number, String, Pair, Symbol, Procedure};
 
+class Object;
+class BoolObj;
+class CharObj;
+class NumberObj;
+class IntegerObj;
+class RationalObj;
+class RealObj;
+class StringObj;
+class PairObj;
+class SymbolObj;
+
 class Object
 {
 	private:
@@ -145,7 +156,6 @@ class IntegerObj: public NumberObj
 		friend bool operator>= (IntegerObj, IntegerObj);
 		
 		friend bool operator!= (IntegerObj, IntegerObj);
-
 };
 
 
@@ -153,13 +163,15 @@ class RationalObj: public NumberObj
 {
 	private:
 
-		RationalObj value;
+		bigRational value;
 
 	public:
 
-		RationalObj(RationalObj i) : NumberObj(Rational), value(i) {}
+		RationalObj(bigRational i) : NumberObj(Rational), value(i) {}
 
 		RationalObj(bigInteger a, bigInteger b) : NumberObj(Rational), value(a, b) {}
+
+		RationalObj(IntegerObj a, IntegerObj b) : NumberObj(Rational), value(a.getValue(), b.getValue()) {}
 
 		virtual ~RationalObj() {}
 
