@@ -16,10 +16,11 @@
 
 #ifndef  __OBJECTS_H____
 #define  __OBJECTS_H____
-#include <useGMP.h>
+#include "useGMP.h"
 #include <string>
+#include <memory>
 
-enum objType {Boolean, Char, Number, String, Pair, Symbol, Procedure};
+enum objType {Bool, Char, Number, String, Pair, Symbol, Procedure};
 
 class Object
 {
@@ -29,11 +30,11 @@ class Object
 
 	public:
 
-		Object(const objType &T) : Type(T), refNumber(0) {}
+		Object(const objType &T) : Type(T) {}
 
 		virtual ~Object() {}
 
-		virtual string ExternalRep()=0;
+		virtual std::string ExternalRep()=0;
 
 };
 
@@ -55,7 +56,7 @@ class BoolObj: public Object
 
 		BoolObj operator! ();
 
-		string ExternalRep();
+		std::string ExternalRep();
 
 		friend bool operator== (BoolObj, BoolObj);
 			
@@ -81,7 +82,7 @@ class CharObj: public Object
 
 		char getValue() const { return value; }
 
-		string ExternalRep();
+		std::string ExternalRep();
 
 		friend bool operator== (CharObj, CharObj);
 
@@ -89,15 +90,19 @@ class CharObj: public Object
 
 class NumberObj: public Object
 {
-	private:
+	protected:
+		
+		enum NumberType { Integer, Rational, Real/*, Complex */};	// First 3 are available now
 
-		static enum NumberType { Interger, Rational, Real/*, Complex */};	// First 3 are available now
+	private:
 
 		NumberType numType;
 
 	public:
 
 		NumberObj(const NumberType & T): Object(Number), numType(T) {}
+
+		virtual std::string ExternalRep()=0;
 
 		virtual ~NumberObj() {}
 
@@ -119,7 +124,7 @@ class IntegerObj: public NumberObj
 
 		bigInteger getValue() const { return value; }
 
-		string ExternalRep();
+		std::string ExternalRep();
 
 		friend bigInteger operator+ (IntegerObj, IntegerObj);
 		
@@ -129,17 +134,17 @@ class IntegerObj: public NumberObj
 		
 		friend bigInteger operator/ (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator< (IntegerObj, IntegerObj);
+		friend bool operator< (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator> (IntegerObj, IntegerObj);
+		friend bool operator> (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator== (IntegerObj, IntegerObj);
+		friend bool operator== (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator<= (IntegerObj, IntegerObj);
+		friend bool operator<= (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator>= (IntegerObj, IntegerObj);
+		friend bool operator>= (IntegerObj, IntegerObj);
 		
-		friend bigInteger operator!= (IntegerObj, IntegerObj);
+		friend bool operator!= (IntegerObj, IntegerObj);
 
 };
 
@@ -164,7 +169,7 @@ class RationalObj: public NumberObj
 
 		bigRational getValue() const { return value; }
 
-		string ExternalRep();
+		std::string ExternalRep();
 
 		friend bigRational operator+ (RationalObj, RationalObj);
 		
@@ -174,17 +179,17 @@ class RationalObj: public NumberObj
 		
 		friend bigRational operator/ (RationalObj, RationalObj);
 		
-		friend bigRational operator< (RationalObj, RationalObj);
+		friend bool operator< (RationalObj, RationalObj);
 		
-		friend bigRational operator> (RationalObj, RationalObj);
+		friend bool operator> (RationalObj, RationalObj);
 		
-		friend bigRational operator== (RationalObj, RationalObj);
+		friend bool operator== (RationalObj, RationalObj);
 		
-		friend bigRational operator<= (RationalObj, RationalObj);
+		friend bool operator<= (RationalObj, RationalObj);
 		
-		friend bigRational operator>= (RationalObj, RationalObj);
+		friend bool operator>= (RationalObj, RationalObj);
 		
-		friend bigRational operator!= (RationalObj, RationalObj);
+		friend bool operator!= (RationalObj, RationalObj);
 
 };
 
@@ -206,7 +211,7 @@ class RealObj: public NumberObj
 
 		bigReal getValue() const { return value; }
 
-		string ExternalRep();
+		std::string ExternalRep();
 
 		friend bigReal operator+ (RealObj, RealObj);
 		
@@ -216,17 +221,17 @@ class RealObj: public NumberObj
 		
 		friend bigReal operator/ (RealObj, RealObj);
 		
-		friend bigReal operator< (RealObj, RealObj);
+		friend bool operator< (RealObj, RealObj);
 		
-		friend bigReal operator> (RealObj, RealObj);
+		friend bool operator> (RealObj, RealObj);
 		
-		friend bigReal operator== (RealObj, RealObj);
+		friend bool operator== (RealObj, RealObj);
 		
-		friend bigReal operator<= (RealObj, RealObj);
+		friend bool operator<= (RealObj, RealObj);
 		
-		friend bigReal operator>= (RealObj, RealObj);
+		friend bool operator>= (RealObj, RealObj);
 		
-		friend bigReal operator!= (RealObj, RealObj);
+		friend bool operator!= (RealObj, RealObj);
 
 };
 
@@ -234,19 +239,19 @@ class StringObj: public Object
 {
 	private:
 
-		string value;
+		std::string value;
 
 	public:
 
-		StringObj(string s): Object(String), value(s) {}
+		StringObj(std::string s): Object(String), value(s) {}
 
 		virtual ~StringObj() {}
 
 		StringObj(const StringObj & obj) : Object(String), value(obj.getValue()) {}
 
-		string getValue() const { return value; }
+		std::string getValue() const { return value; }
 
-		string ExternalRep();
+		std::string ExternalRep();
 
 		friend bool operator== (StringObj, StringObj);
 
@@ -258,41 +263,41 @@ class PairObj: public Object
 {
 	private:
 
-		Object o1, o2;
+		std::shared_ptr<Object> obj1, obj2;
 
 	public:
 
-		PairObj(Object o1, Object o2): Object(Pair), obj1(o1), obj2(o2) {}
+		PairObj(std::shared_ptr<Object> o1, std::shared_ptr<Object> o2): Object(Pair), obj1(o1), obj2(o2) {}
 
 		virtual ~PairObj() {}
 
-		PairObj(const PairObj & obj) : Object(Pair), o1(obj.getCar()), o2(obj.getCdr()) {}
+		PairObj(const PairObj & obj) : Object(Pair), obj1(obj.obj1), obj2(obj.obj2) {}
 
-		string ExternalRep();
+		std::string ExternalRep();
 
-		Object getCar() { return o1; }
+		std::shared_ptr<Object> getCar() const { return obj1; }
 
-		Object getCdr() { return o2; }
+		std::shared_ptr<Object> getCdr() const { return obj2; }
 };
 
 class SymbolObj: public Object
 {
 	private:
 
-		string value;
+		std::string value;
 
 	public:
 
-		SymbolObj(string s): Object(Symbol), value(s) {}
+		SymbolObj(std::string s): Object(Symbol), value(s) {}
 
 		virtual ~SymbolObj() {}
 
-		SymbolObj(const SymbolObj & obj ): Object(Symbol), value(obj.getValue()) {}
+		SymbolObj(const SymbolObj & obj ): Object(Symbol), value(obj.value) {}
 
-		string getValue() { retrun value; }
+		std::string getValue() const { return value; }
 
-		string ExternalRep();
+		std::string ExternalRep();
 
-}
+};
 
 #endif
