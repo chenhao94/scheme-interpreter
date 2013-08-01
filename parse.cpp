@@ -57,8 +57,28 @@ ParseTree* Parsing(std::string code) // code should be refined first
 			}
 
 		}
-		else
+		else if (code[0]=='\'')		//	'( ... )
 		{
+			bool firstName = true;
+			ParseTree *quote, *lastName = NULL, *newName;
+			std::string name;
+			int pos = 1;
+
+			while (getToken(name, code, pos))
+			{
+				newName = new ParseTree(name);
+
+				if (lastName==NULL)
+					quote = new ParseTree("\'", newName);
+				else
+					lastName.brother = newName;
+
+				lastName = newName;
+			}
+		}
+		else // quasiquotation		`( ... )
+		{
+			// W.T.F.
 		}
 		return;
 	}
@@ -70,22 +90,30 @@ ParseTree* Parsing(std::string code) // code should be refined first
 		else if ( code[1]=='\\' )
 		{
 			//char
-			// W.T.F.
+			if (code_size==3 || ( code_size<10 && code == "#\\space" || code == "#\\tab" || code=="#\\newline" ))
+			{
+				ParseTree *node = new ParseTree(code);
+				return node;
+			}
+			else 
+				throw syntaxError("bad character constant: " + code);
 		}
 		else if ( code[1]=='(' )
 		{
 			// vector
+			throw syntaxError("vectors are not available now");
 			// W.T.F.
 		}
-		else if (code_size==2 && code[1]=='t')
+		else if (code_size==2)
 		{
-			// bool value "true"
-			// W.T.F.
-		}
-		else if (code_size==2 && code[1]=='f')
-		{
-			// bool value "false"
-			// W.T.F.
+			// bool value
+			if (code[1]=='t' || code[1]=='f')
+			{
+				ParseTree *node = new ParseTree(code);
+				return node;
+			}
+			else
+				throw syntaxError("bad syntax \'" + code + "\'");
 		}
 		else
 		{
@@ -100,16 +128,74 @@ ParseTree* Parsing(std::string code) // code should be refined first
 	else if ( code[0]=='(' )
 	{
 		// list (syntax or procedure)
-		// W.T.F.
+		ParseTree *listToken, *newName, *lastName = NULL;
+		std::string name;
+		int pos = 1;
+
+		while ( getToken( name, code, pos ) )
+		{
+			newName = Parsing(name);
+			if (lastName==NULL)
+				listToken = new ParseTree("()", newName);
+			else
+				lastName.brother = newName;
+			lastName = newName;
+		}
+
+		if (lastName == NULL)
+			throw syntaxError("missing procedure expression");
+
+		return listToken;
 	}
 	else if ( code[0]=='\"' )
 	{
 		// string
 		doubleQuote:
-		// W.T.F.
+		ParseTree *node = new ParseTree(code);
+		return node;
 	}
-	else if ( code[0] ) // identifiers or numbers without redundant whitspaces
+	else // identifiers or numbers without redundant whitspaces
 	{
-		// 
+		bool rationalFlag = false, realFlag = false, numbersFlag = true;
+		
+		for (int pos = 0; pos<code_size; ++pos)
+		{
+			if ( code[pos]=='.' )
+			{
+				if ( code_size==1 || rationalFlag || realFlag )
+				{
+					numbersFlag = false;
+					break;
+				}
+				realFlag = true;
+			}
+			else if (code[pos]=='/' )
+			{
+				if (pos==0 || pos==code_size-1 || rationalFlag || realFlag)
+				{
+					numbersFlag = false;
+					break;
+				}
+				rationalFlag = true;
+			}
+			else if ( !isdigit(code[pos]) )
+			{
+				numbersFlag = false;
+				break;
+			}
+		}
+
+		if ( numbersFlag==false )
+		{
+			if ( isdigit(code[0]) || code[0]=='.' )
+				throw syntaxError("Illegal identifier: " + code );
+		}
+
+		ParseTree *node = new ParseTree(code);
+		return node;
+
 	}
 }
+
+bool getToken( std::string &name, const std::string &code, int &pos )
+{}

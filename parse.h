@@ -9,6 +9,12 @@
 #include "environments.h"
 #include <string>
 
+class ParseTree;
+
+bool getToken( std::string &name, const std::string &code, int &pos ); // distract the first token start with 'pos', put it in 'name', if failed, return false
+
+ParseTree* Parsing(std::string);
+
 class ParseTree
 {	
 	public:
@@ -34,9 +40,9 @@ class ParseTree
 		ParseTree* getBrother { return brother; }
 
 		std::string getToken { return token; }
-};
 
-ParseTree* Parsing(std::string);
+	friend ParseTree* Parsing(std::string);
+};
 
 #endif
 
