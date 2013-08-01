@@ -21,6 +21,44 @@ char graph[500][500]={0};
 int layerMax[100]={0};
 int depth=0;
 
+void dfs( ParseTree *root, long layer, long fieldpos)
+{
+	if (root == NULL)
+		return;
+	string s = root->getToken();
+	int len = s.size(), pos = fieldwidth * fieldpos;
+	int verPos = height * layer;
+
+	if (layer>depth)
+		depth = layer;
+	if (fieldpos>layerMax[layer])
+		layerMax[layer] = fieldpos;
+
+	for (int i=0; i<len; ++i)
+		graph[verPos][pos + i] = s[i];
+
+	if (root->son)
+	{
+		for (int i=1; i<height; ++i)
+			graph[verPos + i][pos] = '|';
+		dfs(root->son, layer + 1, fieldpos);
+	}
+
+	if (root->brother)
+	{
+		int nextfpos = fieldpos + 1;
+		int nextpos;
+		if (layerMax[layer + 1] + 1 >nextfpos)
+			nextfpos = layerMax[layer + 1] + 1;
+		nextpos = fieldwidth * nextfpos - 1;
+
+		for (int i = pos + len + 1; i<nextpos; ++i)
+			graph[verPos][i] = '-';
+
+		dfs(root->brother, layer, nextfpos);
+	}
+}
+
 int main()
 {
 	gets(s);
@@ -29,9 +67,9 @@ int main()
 
 	tree = Parsing(s);
 
-	dfs(tree, 0);
+	dfs(tree, 0, 0);
 
-	for (int i=0; i<width; ++i)
+	for (int i=0; i<width; ++i)//WTF
 	{
 		for (int j=0; j<fieldwidth*layerMax[i]; ++j)
 			if (graph[i][j]==0)
