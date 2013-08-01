@@ -11,7 +11,7 @@
 
 class ParseTree;
 
-bool getToken( std::string &name, const std::string &code, int &pos ); // distract the first token start with 'pos', put it in 'name', if failed, return false
+bool getToken( std::string &name, const std::string &code, int &pos ); // distract the first token from the list, start with 'pos', put it in 'name', if failed, return false
 
 ParseTree* Parsing(std::string);
 
