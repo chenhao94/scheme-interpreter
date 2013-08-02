@@ -71,17 +71,18 @@ ParseTree* Parsing(std::string code) // code should be refined first
 				if (lastName==NULL)
 					quote = new ParseTree("\'", newName);
 				else
-					lastName.brother = newName;
+					lastName->brother = newName;
 
 				lastName = newName;
 			}
+
+			return quote;
 		}
 		else // quasiquotation		`( ... )
 		{
 			// W.T.F.
 			throw syntaxError("quasiquotations are not available now");
 		}
-		return;
 	}
 	else if ( code[0]=='#' )
 	{
@@ -139,7 +140,7 @@ ParseTree* Parsing(std::string code) // code should be refined first
 			if (lastName==NULL)
 				listToken = new ParseTree("()", newName);
 			else
-				lastName.brother = newName;
+				lastName->brother = newName;
 			lastName = newName;
 		}
 
@@ -203,7 +204,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 	// distract the first token from list, start with 'pos', put it in 'name', if failed, return false
 	
 	int pareLevel = 0; // level of parentheses
-	bool quoteFlag = false // flag of quotaion
+	bool quoteFlag = false; // flag of quotaion
 
 	int code_size = code.size();
 
@@ -214,7 +215,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 	if (pos>=code_size-1)
 		return false;
 
-	if (code==')')
+	if (code[pos]==')')
 		throw syntaxError("unexpected \')\' here");
 
 	if (code[pos]=='\"')						//string
@@ -331,7 +332,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 			throw syntaxError("Illegal use of \',\'");
 
 		if (code[pos]=='\"')
-			goto doubleQuotaion;
+			goto doubleQuotation;
 		else if (code[pos]=='\'' || code[pos]=='`')
 			goto quotation;
 		else if (code[pos]=='(')

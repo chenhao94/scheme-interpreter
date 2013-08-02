@@ -29,6 +29,8 @@ void dfs( ParseTree *root, long layer, long fieldpos)
 	int len = s.size(), pos = fieldwidth * fieldpos;
 	int verPos = height * layer;
 
+	ParseTree *son = root->getSon(), *brother = root->getBrother();
+
 	if (layer>depth)
 		depth = layer;
 	if (fieldpos>layerMax[layer])
@@ -37,14 +39,14 @@ void dfs( ParseTree *root, long layer, long fieldpos)
 	for (int i=0; i<len; ++i)
 		graph[verPos][pos + i] = s[i];
 
-	if (root->son)
+	if (son)
 	{
 		for (int i=1; i<height; ++i)
 			graph[verPos + i][pos] = '|';
-		dfs(root->son, layer + 1, fieldpos);
+		dfs(son, layer + 1, fieldpos);
 	}
 
-	if (root->brother)
+	if (brother)
 	{
 		int nextfpos = fieldpos + 1;
 		int nextpos;
@@ -55,23 +57,36 @@ void dfs( ParseTree *root, long layer, long fieldpos)
 		for (int i = pos + len + 1; i<nextpos; ++i)
 			graph[verPos][i] = '-';
 
-		dfs(root->brother, layer, nextfpos);
+		dfs(brother, layer, nextfpos);
 	}
 }
 
 int main()
 {
-	gets(s);
+	char st[500];
+	gets(st);
+	s = st;
 	if (s[s.size()-1]=='\n')
 		s.pop_back();
 
-	tree = Parsing(s);
+	try
+	{
+		tree = Parsing(s);
+	}
+	catch (syntaxError err) { cout << err.getMsg() << endl; return 0; }
+
+	for (int i=0; i<=100; ++i)
+		for (int j=0; j<=100; ++j)
+			graph[i][j]=' ';
+
+	for (int i=0; i<100; ++i)
+		layerMax[i]=-1;
 
 	dfs(tree, 0, 0);
 
-	for (int i=0; i<width; ++i)//WTF
+	for (int i=0; i<=height * depth; ++i)//WTF
 	{
-		for (int j=0; j<fieldwidth*layerMax[i]; ++j)
+		for (int j=0; j<width; ++j)
 			if (graph[i][j]==0)
 				cout << ' ';
 			else

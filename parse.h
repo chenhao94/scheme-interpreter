@@ -38,9 +38,9 @@ class ParseTree
 
 		ParseTree* getSon() { return son; }
 
-		ParseTree* getBrother { return brother; }
+		ParseTree* getBrother() { return brother; }
 
-		std::string getToken { return token; }
+		std::string getToken() { return token; }
 
 	friend ParseTree* Parsing(std::string);
 };

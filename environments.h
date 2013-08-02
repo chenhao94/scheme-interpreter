@@ -20,7 +20,7 @@ class Environment
 		
 		Obj_map env_map;
 
-		Enviornment *next;
+		Environment *next;
 
 	public:
 
