@@ -80,6 +80,9 @@ ParseTree* Parsing(std::string code) // code should be refined first
 				lastName = newName;
 			}
 
+			if (lastName==NULL)
+				quote = new ParseTree("\'");
+
 			return quote;
 		}
 		else // quasiquotation		`( ... )
@@ -152,7 +155,8 @@ ParseTree* Parsing(std::string code) // code should be refined first
 		}
 
 		if (lastName == NULL)
-			throw syntaxError("missing procedure expression");
+			listToken = new ParseTree("()");
+			//throw syntaxError("missing procedure expression");
 
 		return listToken;
 	}
@@ -258,6 +262,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 	else if (code[pos]=='\'' || code[pos]=='`')	// quotation
 	{
 		quotation:
+		name.push_back(code[pos++]);
 		while ( isspace(code[pos]) && pos<code_size-1 ) ++pos;
 		
 		if (pos>=code_size-1 || code[pos]=='\'' || code[pos]=='`' || code[pos]==',' || code[pos]=='@' || code[pos]==')')

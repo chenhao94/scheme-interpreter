@@ -18,7 +18,8 @@ ParseTree* tree;
 
 char graph[500][500]={0};
 
-int layerMax[100]={0};
+//int layerMax[100]={0};
+int layerMax=-1;
 int depth=0;
 
 void dfs( ParseTree *root, long layer, long fieldpos)
@@ -33,8 +34,8 @@ void dfs( ParseTree *root, long layer, long fieldpos)
 
 	if (layer>depth)
 		depth = layer;
-	if (fieldpos>layerMax[layer])
-		layerMax[layer] = fieldpos;
+	if (fieldpos>layerMax/*[layer]*/)
+		layerMax/*[layer]*/ = fieldpos;
 
 	for (int i=0; i<len; ++i)
 		graph[verPos][pos + i] = s[i];
@@ -50,8 +51,8 @@ void dfs( ParseTree *root, long layer, long fieldpos)
 	{
 		int nextfpos = fieldpos + 1;
 		int nextpos;
-		if (layerMax[layer + 1] + 1 >nextfpos)
-			nextfpos = layerMax[layer + 1] + 1;
+		if (layerMax/*[layer + 1]*/ + 1 >nextfpos)
+			nextfpos = layerMax/*[layer + 1]*/ + 1;
 		nextpos = fieldwidth * nextfpos - 1;
 
 		for (int i = pos + len + 1; i<nextpos; ++i)
@@ -64,36 +65,51 @@ void dfs( ParseTree *root, long layer, long fieldpos)
 int main()
 {
 	char st[500];
-	gets(st);
-	s = st;
-	if (s[s.size()-1]=='\n')
-		s.pop_back();
 
-	try
+	while (1)
 	{
-		tree = Parsing(s);
-	}
-	catch (syntaxError err) { cout << err.getMsg() << endl; return 0; }
+		gets(st);
+		s = st;
+		if (s[s.size()-1]=='\n')
+			s.pop_back();
 
-	for (int i=0; i<=width; ++i)
-		for (int j=0; j<=width; ++j)
-			graph[i][j]=' ';
+		if (tree!=NULL)
+			tree -> ~ParseTree();
 
-	for (int i=0; i<100; ++i)
-		layerMax[i]=-1;
+		depth = 0;
 
-	dfs(tree, 0, 0);
+		try
+		{
+			tree = Parsing(s);
+		}
+		catch (syntaxError err) { cout << err.getMsg() << endl; continue; }
 
-	for (int i=0; i<=height * depth; ++i)//WTF
-	{
-		for (int j=0; j<width; ++j)
-			if (graph[i][j]==0)
-				cout << ' ';
-			else
-				cout << graph[i][j];
+		for (int i=0; i<=width; ++i)
+			for (int j=0; j<=width; ++j)
+				graph[i][j]=' ';
+
+		//for (int i=0; i<100; ++i)
+		//	layerMax[i]=-1;
+		layerMax=-1;
+
+		dfs(tree, 0, 0);
+
 		cout << endl;
 
+		for (int i=0; i<=height * depth; ++i)//WTF
+		{
+			for (int j=0; j<width; ++j)
+				if (graph[i][j]==0)
+					cout << ' ';
+				else
+					cout << graph[i][j];
+			cout << endl;
+
+		}
+
+		cout << endl;
 	}
+
 
 	return 0;
 }
