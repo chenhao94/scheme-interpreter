@@ -23,6 +23,8 @@ void ParseTree::evaluate()
 
 ParseTree* Parsing(std::string code) // code should be refined first
 {
+	while ( isspace(code.back()) ) code.pop_back();
+
 	int code_size = code.size();
 	if (code_size==0)
 		return NULL;
@@ -59,10 +61,12 @@ ParseTree* Parsing(std::string code) // code should be refined first
 		}
 		else if (code[0]=='\'')		//	'( ... )
 		{
-			bool firstName = true;
 			ParseTree *quote, *lastName = NULL, *newName;
 			std::string name;
-			int pos = 1;
+			int pos = 2;
+
+			if (code.back()!=')')
+				throw syntaxError("expected a \')\' to close \'(\'");
 
 			while (getToken(name, code, pos))
 			{
@@ -133,6 +137,9 @@ ParseTree* Parsing(std::string code) // code should be refined first
 		ParseTree *listToken, *newName, *lastName = NULL;
 		std::string name;
 		int pos = 1;
+
+		if (code.back()!=')')
+			throw syntaxError("expected a \')\' to close \'(\'");
 
 		while ( getToken( name, code, pos ) )
 		{
@@ -243,7 +250,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 			}
 		}
 
-		if (pos>=code_size-1 || quoteFlag==true)
+		if (pos>code_size-1 || quoteFlag==true)
 			throw syntaxError("expect a \'\"\' here");
 
 		return true;
@@ -271,7 +278,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 
 		while (pos<code_size-1)
 		{
-			if (quoteFlag==false)
+			if (quoteFlag==true)
 			{
 				if (code[pos]=='\"')
 				{
@@ -312,7 +319,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 			}
 		}
 
-		if (pos>=code_size-1 || pareLevel!=0 || quoteFlag==true)
+		if (pos>code_size-1 || pareLevel!=0 || quoteFlag==true)
 			throw syntaxError("Illegal list expression");
 
 		return true;
@@ -341,16 +348,29 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 			goto commonplace;
 
 	}
+	else if (code[pos]=='#')
+	{
+		name.push_back(code[pos++]);
+
+		if (code[pos]=='\\')
+		{
+			name.push_back(code[pos++]);
+			name.push_back(code[pos++]);
+		}
+
+		goto commonplace;
+	}
 	else										//commonplace
 	{
 		commonplace:
 		while (pos<code_size-1)
 		{
 			if (code[pos]=='(' || code[pos]==')' || code[pos]=='\'' || code[pos]=='`' || code[pos]=='\"' || code[pos]==',' || isspace(code[pos]))
-				return true;
+				break;
 			else
 				name.push_back(code[pos++]);
 		}
+		return true;
 	}
 
 }

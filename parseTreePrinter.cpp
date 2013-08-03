@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 #include "parse.h"
-#define width 80
+#define width 100
 #define height 5
 #define fieldwidth 10 
 
@@ -75,8 +75,8 @@ int main()
 	}
 	catch (syntaxError err) { cout << err.getMsg() << endl; return 0; }
 
-	for (int i=0; i<=100; ++i)
-		for (int j=0; j<=100; ++j)
+	for (int i=0; i<=width; ++i)
+		for (int j=0; j<=width; ++j)
 			graph[i][j]=' ';
 
 	for (int i=0; i<100; ++i)
