@@ -20,9 +20,13 @@ class Environment
 		
 		Obj_map env_map;
 
+	public:
+
 		Environment *next;
 
-	public:
+		Environment() : next(NULL) {}
+
+		virtual ~Environment();
 
 		void DefineObj(std::string, Obj_ptr);
 

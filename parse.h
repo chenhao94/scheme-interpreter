@@ -34,8 +34,6 @@ class ParseTree
 
 		virtual ~ParseTree();
 
-		void evaluate();	// evaluate the subtree and turn it to a node.
-
 		ParseTree* getSon() { return son; }
 
 		ParseTree* getBrother() { return brother; }

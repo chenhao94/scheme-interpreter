@@ -16,11 +16,6 @@ ParseTree::~ParseTree()
 		brother->~ParseTree();
 }
 
-void ParseTree::evaluate()
-{
-	// W.T.F
-}
-
 ParseTree* Parsing(std::string code) // code should be refined first
 {
 	while ( isspace(code.back()) ) code.pop_back();

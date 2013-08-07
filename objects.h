@@ -32,6 +32,8 @@ class RealObj;
 class StringObj;
 class PairObj;
 class SymbolObj;
+class ProcedureObj;
+class ParseTree;
 
 class Object
 {
@@ -309,6 +311,50 @@ class SymbolObj: public Object
 		std::string getValue() const { return value; }
 
 		std::string ExternalRep();
+
+};
+
+class ProcedureObj: public Object
+{
+
+	public:
+
+		class Arguments;
+
+		typedef Arguments* Arg_ptr;
+
+		typedef ParseTree* ParseTree_ptr;
+
+		class Arguments
+		{
+			private:
+
+				std::string name;
+
+				bool spaceDelimited;
+
+				Arg_ptr next;
+
+			public:
+
+				Arguments(const std::string &nam, const bool & flag): name(nam), spaceDelimited(flag) {}
+
+				virtual ~Arguments() {}
+		};
+
+	private:
+
+		Arg_ptr argHead;
+
+		ParseTree_ptr body;
+
+	public:
+
+		ProcedureObj(const Arg_ptr & h, const ParseTree_ptr & b):  Object(Procedure), argHead(h), body(b){}
+
+		virtual ~ProcedureObj() {}
+
+		std::string ExternalRep() { return "#<procedure>"; }
 
 };
 
