@@ -17,6 +17,8 @@ typedef std::map<std::string, Obj_ptr> Obj_map;
 class Environment
 {
 	private:
+
+		typedef Environment* env_ptr;
 		
 		Obj_map env_map;
 
@@ -24,7 +26,7 @@ class Environment
 
 		Environment *next;
 
-		Environment() : next(NULL) {}
+		Environment(const env_ptr &ptr=NULL) : next(ptr) {}
 
 		virtual ~Environment();
 
