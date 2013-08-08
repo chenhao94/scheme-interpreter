@@ -9,7 +9,11 @@ typedef Environment* env_ptr;
 
 void checkToken(const std::string &, bool &, bool &, bool &, bool &);
 
-Object* findIden(env_ptr env, std::string);
+Object* findIden(env_ptr env, const std::string&);
+
+Object* evaluateBuiltIn(const std::string &, const Para_ptr&);
+
+Object* evaluateUserDefined(const Obj_ptr &, const Para_ptr);
 
 Object* evaluate(ParseTree* root, const env_ptr & env)
 {
@@ -41,7 +45,7 @@ Object* evaluate(ParseTree* root, const env_ptr & env)
 		obj = findIden(env);
 		if (obj==NULL)
 			throw syntaxError("Undefined identifier: " + token);
-		return obj;
+		return obGj;
 	}
 
 	//----char&bool-----
@@ -103,13 +107,32 @@ Object* evaluate(ParseTree* root, const env_ptr & env)
 		else if (obj->Type != Procedure)
 			throw syntaxError("\'" + iden + "\' is not a procedure");
 
+		ParseTree *para = name->getBrother();
+		Parameter *head=NULL, *tail=NULL;
+
+		while (para!=NULL)
+		{
+			if (head==NULL)
+			{
+				head = new Parameters(evaluate(para));
+				tail = head;
+			}
+			else
+			{
+				tail.next = new Parameters(evaluate(para));
+				tail = tail.next;
+			}
+
+			para = para->getBrother();
+		}
+
 		if (obj)	//define by user
 		{
-			//W.T.F.
+			return evaluateUserDefined(obj, head);
 		}
 		else		// built-in
 		{
-			//W.T.F.
+			return evaluateBuiltIn(iden, head);
 		}
 
 	}
@@ -122,7 +145,7 @@ Object* evaluate(ParseTree* root, const env_ptr & env)
 
 }
 
-Object* findIden(env_ptr env, std::string name);
+Object* findIden(env_ptr env, const std::string &name);
 {
 	Object *obj;
 	while (env!=NULL)

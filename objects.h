@@ -34,6 +34,13 @@ class PairObj;
 class SymbolObj;
 class ProcedureObj;
 class ParseTree;
+class Arguments;
+class Parameters;
+
+typedef Object* Obj_ptr;
+typedef Arguments* Arg_ptr;
+typedef Parameters* Para_ptr;
+typedef ParseTree* ParseTree_ptr;
 
 class Object
 {
@@ -317,31 +324,6 @@ class SymbolObj: public Object
 class ProcedureObj: public Object
 {
 
-	public:
-
-		class Arguments;
-
-		typedef Arguments* Arg_ptr;
-
-		typedef ParseTree* ParseTree_ptr;
-
-		class Arguments
-		{
-			private:
-
-				std::string name;
-
-				bool spaceDelimited;
-
-				Arg_ptr next;
-
-			public:
-
-				Arguments(const std::string &nam, const bool & flag): name(nam), spaceDelimited(flag) {}
-
-				virtual ~Arguments() {}
-		};
-
 	private:
 
 		Arg_ptr argHead;
@@ -356,6 +338,36 @@ class ProcedureObj: public Object
 
 		std::string ExternalRep() { return "#<procedure>"; }
 
+};
+
+class Arguments
+{
+	private:
+
+		std::string name;
+
+		bool spaceDelimited;
+
+	public:
+
+		Arg_ptr next;
+
+		Arguments(const std::string &nam, const bool & flag): name(nam), spaceDelimited(flag) {}
+
+		virtual ~Arguments() {}
+};
+
+class Parameters
+{
+	private:
+
+		Obj_ptr obj;
+
+	public:
+
+		Para_ptr next;
+
+		Parameters(const Obj_ptr & o): obj(o), next(NULL) {}
 };
 
 #endif
