@@ -9,16 +9,14 @@ typedef Environment* env_ptr;
 
 void checkToken(const std::string &, bool &, bool &, bool &, bool &);
 
-Object* findIden(env_ptr env, const std::string&);
+Obj_ptr findIden(env_ptr env, const std::string&);
 
-Object* evaluateBuiltIn(const std::string &, const Para_ptr&);
+Obj_ptr evaluateUserDefined(const Obj_ptr &, const Para_ptr);
 
-Object* evaluateUserDefined(const Obj_ptr &, const Para_ptr);
-
-Object* evaluate(ParseTree* root, const env_ptr & env)
+Obj_ptr evaluate(ParseTree* root, const env_ptr & env)
 {
 	std::string token = root->getToken();
-	Object *obj;
+	Obj_ptr obj;
 
 	bool numberFlag = true, rationalFlag = false, realFlag = false, idenFlag = true;
 
@@ -145,9 +143,9 @@ Object* evaluate(ParseTree* root, const env_ptr & env)
 
 }
 
-Object* findIden(env_ptr env, const std::string &name);
+Obj_ptr findIden(env_ptr env, const std::string &name);
 {
-	Object *obj;
+	Obj_ptr obj;
 	while (env!=NULL)
 	{
 		obj = env.FindObj(name);
@@ -210,3 +208,4 @@ void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, 
 		}
 	}
 }
+
