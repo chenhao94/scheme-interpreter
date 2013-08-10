@@ -10,8 +10,8 @@
 #include "compilingError.h"
 #include <string>
 
-static Environment *global = new Environment;
+static env_ptr global = new Environment;
 
-Object* evaluate(ParseTree* root);
+Obj_ptr evaluate(ParseTree_ptr root);
 
 #endif

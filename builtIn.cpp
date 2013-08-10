@@ -28,6 +28,14 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 
 		if (para2==NULL || para2->next!=NULL)
 			throw syntaxError("W.T.F.");
+
+		if (para.Type!=number || para2.Type!=number)
+			throw syntaxError("W.T.F.");
+
+		bool value = false;
+		//W.T.F.
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
 	}
 	else if (name==">")
 	{

@@ -16,7 +16,7 @@ ParseTree::~ParseTree()
 		brother->~ParseTree();
 }
 
-ParseTree* Parsing(std::string code) // code should be refined first
+ParseTree_ptr Parsing(std::string code) // code should be refined first
 {
 	while ( isspace(code.back()) ) code.pop_back();
 
@@ -48,15 +48,15 @@ ParseTree* Parsing(std::string code) // code should be refined first
 			else
 			{
 				code.erase(0,1);
-				ParseTree *context = new ParseTree(code);
-				ParseTree *quote = new ParseTree("\'", context);
+				ParseTree_ptr context( new ParseTree(code));
+				ParseTree_ptr quote( new ParseTree("\'", context));
 				return quote;
 			}
 
 		}
 		else if (code[0]=='\'')		//	'( ... )
 		{
-			ParseTree *quote, *lastName = NULL, *newName;
+			ParseTree_ptr quote, lastName(NULL), newName;
 			std::string name;
 			int pos = 2;
 
@@ -65,10 +65,10 @@ ParseTree* Parsing(std::string code) // code should be refined first
 
 			while (getToken(name, code, pos))
 			{
-				newName = new ParseTree(name);
+				newName = ParseTree_ptr(new ParseTree(name));
 
 				if (lastName==NULL)
-					quote = new ParseTree("\'", newName);
+					quote = ParseTree_ptr(new ParseTree("\'", newName));
 				else
 					lastName->brother = newName;
 
@@ -76,7 +76,7 @@ ParseTree* Parsing(std::string code) // code should be refined first
 			}
 
 			if (lastName==NULL)
-				quote = new ParseTree("\'");
+				quote = ParseTree_ptr(new ParseTree("\'"));
 
 			return quote;
 		}
@@ -96,7 +96,7 @@ ParseTree* Parsing(std::string code) // code should be refined first
 			//char
 			if (code_size==3 || ( code_size<10 && code == "#\\space" || code == "#\\tab" || code=="#\\newline" ))
 			{
-				ParseTree *node = new ParseTree(code);
+				ParseTree_ptr node( new ParseTree(code) );
 				return node;
 			}
 			else 
@@ -113,7 +113,7 @@ ParseTree* Parsing(std::string code) // code should be refined first
 			// bool value
 			if (code[1]=='t' || code[1]=='f')
 			{
-				ParseTree *node = new ParseTree(code);
+				ParseTree_ptr node( new ParseTree(code) );
 				return node;
 			}
 			else
@@ -132,7 +132,7 @@ ParseTree* Parsing(std::string code) // code should be refined first
 	else if ( code[0]=='(' )
 	{
 		// list (syntax or procedure)
-		ParseTree *listToken, *newName, *lastName = NULL;
+		ParseTree_ptr listToken, newName, lastName = NULL;
 		std::string name;
 		int pos = 1;
 
@@ -143,14 +143,14 @@ ParseTree* Parsing(std::string code) // code should be refined first
 		{
 			newName = Parsing(name);
 			if (lastName==NULL)
-				listToken = new ParseTree("()", newName);
+				listToken = ParseTree_ptr( new ParseTree("()", newName) );
 			else
 				lastName->brother = newName;
 			lastName = newName;
 		}
 
 		if (lastName == NULL)
-			listToken = new ParseTree("()");
+			listToken = ParseTree_ptr( new ParseTree("()") );
 			//throw syntaxError("missing procedure expression");
 
 		return listToken;
@@ -159,7 +159,7 @@ ParseTree* Parsing(std::string code) // code should be refined first
 	{
 		// string
 		doubleQuote:
-		ParseTree *node = new ParseTree(code);
+		ParseTree_ptr node( new ParseTree(code) );
 		return node;
 	}
 	else // identifiers or numbers without redundant whitspaces
@@ -199,7 +199,7 @@ ParseTree* Parsing(std::string code) // code should be refined first
 				throw syntaxError("Illegal identifier: " + code );
 		}
 
-		ParseTree *node = new ParseTree(code);
+		ParseTree_ptr node( new ParseTree(code) );
 		return node;
 
 	}

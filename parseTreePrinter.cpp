@@ -14,7 +14,7 @@ using namespace std;
 
 string s;
 
-ParseTree* tree;
+ParseTree_ptr tree;
 
 char graph[500][500]={0};
 
@@ -22,7 +22,7 @@ char graph[500][500]={0};
 int layerMax=-1;
 int depth=0;
 
-void dfs( ParseTree *root, long layer, long fieldpos)
+void dfs( ParseTree_ptr root, long layer, long fieldpos)
 {
 	if (root == NULL)
 		return;
@@ -30,7 +30,7 @@ void dfs( ParseTree *root, long layer, long fieldpos)
 	int len = s.size(), pos = fieldwidth * fieldpos;
 	int verPos = height * layer;
 
-	ParseTree *son = root->getSon(), *brother = root->getBrother();
+	ParseTree_ptr son = root->getSon(), brother = root->getBrother();
 
 	if (layer>depth)
 		depth = layer;

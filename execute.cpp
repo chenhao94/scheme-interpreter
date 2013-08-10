@@ -5,15 +5,13 @@
 #include "execute.h"
 #include <cctype>
 
-typedef Environment* env_ptr;
-
 void checkToken(const std::string &, bool &, bool &, bool &, bool &);
 
 Obj_ptr findIden(env_ptr env, const std::string&);
 
 Obj_ptr evaluateUserDefined(const Obj_ptr &, const Para_ptr);
 
-Obj_ptr evaluate(ParseTree* root, const env_ptr & env)
+Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 {
 	std::string token = root->getToken();
 	Obj_ptr obj;
@@ -92,9 +90,9 @@ Obj_ptr evaluate(ParseTree* root, const env_ptr & env)
 	//----syntax&procedure----
 	else if (token=="()")
 	{
-		ParseTree *name = root->getSon();
+		ParseTree_ptr name = root->getSon();
 		std::string iden = name->getToken();
-		Object *obj = findIden(env, iden);
+		Obj_ptr obj = findIden(env, iden);
 
 		if (obj==NULL)
 		{
@@ -105,8 +103,8 @@ Obj_ptr evaluate(ParseTree* root, const env_ptr & env)
 		else if (obj->Type != Procedure)
 			throw syntaxError("\'" + iden + "\' is not a procedure");
 
-		ParseTree *para = name->getBrother();
-		Parameter *head=NULL, *tail=NULL;
+		ParseTree_ptr para = name->getBrother();
+		Parameter_ptr head=NULL, tail=NULL;
 
 		while (para!=NULL)
 		{

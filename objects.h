@@ -37,10 +37,20 @@ class ParseTree;
 class Arguments;
 class Parameters;
 
-typedef Object* Obj_ptr;
-typedef Arguments* Arg_ptr;
-typedef Parameters* Para_ptr;
-typedef ParseTree* ParseTree_ptr;
+typedef std::shared_ptr<Object> Obj_ptr;
+typedef std::shared_ptr<BoolObj> Bool_ptr;
+typedef std::shared_ptr<CharObj> Char_ptr;
+typedef std::shared_ptr<NumberObj> Number_ptr;
+typedef std::shared_ptr<IntegerObj> Int_ptr;
+typedef std::shared_ptr<RationalObj> Rational_ptr;
+typedef std::shared_ptr<RealObj> Real_ptr;
+typedef std::shared_ptr<StringObj> String_ptr;
+typedef std::shared_ptr<PairObj> Pair_ptr;
+typedef std::shared_ptr<SymbolObj> Symbol_ptr;
+typedef std::shared_ptr<ProcedureObj> Procedure_ptr;
+typedef std::shared_ptr<Arguments> Arg_ptr;
+typedef std::shared_ptr<Parameters> Para_ptr;
+typedef std::shared_ptr<ParseTree> ParseTree_ptr;
 
 class Object
 {

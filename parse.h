@@ -14,19 +14,15 @@ class ParseTree;
 
 bool getToken( std::string &name, const std::string &code, int &pos ); // distract the first token from the list, start with 'pos', put it in 'name', if failed, return false
 
-ParseTree* Parsing(std::string);
+ParseTree_ptr Parsing(std::string);
 
 class ParseTree
 {	
-	public:
-
-		typedef ParseTree* ParseTree_ptr;
-
 	private:
 
 		std::string token;
 
-		ParseTree *son, *brother;
+		ParseTree_ptr son, brother;
 
 	public:
 
@@ -34,13 +30,13 @@ class ParseTree
 
 		virtual ~ParseTree();
 
-		ParseTree* getSon() { return son; }
+		ParseTree_ptr getSon() { return son; }
 
-		ParseTree* getBrother() { return brother; }
+		ParseTree_ptr getBrother() { return brother; }
 
 		std::string getToken() { return token; }
 
-	friend ParseTree* Parsing(std::string);
+	friend ParseTree_ptr Parsing(std::string);
 };
 
 #endif
