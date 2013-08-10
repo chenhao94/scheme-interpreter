@@ -200,3 +200,32 @@ bool operator!= (T a, T b)
 {
 	return (a.value != b.value);
 }
+
+bool operator== (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a=aPtr.get(), *b=bPtr.get();
+	if (a->Type!=b->Type)
+		return false;
+	if (a->Type==Bool)
+		return operator==( *static_cast<Object::BoolObj*>(a), *static_cast<Object::BoolObj*>(b) );
+	if (a->Type==Char)
+		return operator==( *static_cast<Object::CharObj*>(a), *static_cast<Object::CharObj*>(b) );
+	if (a->Type==Number)
+	{
+		NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+		if (aT==Real || bT==Real)
+			return operator==( *static_cast<Object::RealObj*>(a), *static_cast<Object::RealObj*>(b) );
+		if (aT==Rational || bT==Rational)
+			return operator==( *static_cast<Object::RationalObj*>(a), *static_cast<Object::RationalObj*>(b) );
+		return operator==( *static_cast<Object::IntegerObj*>(a), *static_cast<Object::IntegerObj*>(b) );
+
+	}
+	if (a->Type==String)
+		return operator==( *static_cast<Object::StringObj*>(a), *static_cast<Object::StringObj*>(b) );
+	if (a->Type==Pair)
+		return operator==( *static_cast<Object::PairObj*>(a), *static_cast<Object::PairObj*>(b) );
+	if (a->Type==Symbol)
+		return operator==( *static_cast<Object::SymbolObj*>(a), *static_cast<Object::SymbolObj*>(b) );
+	if (a->Type==Procedure)
+		return a==b;
+}

@@ -21,6 +21,8 @@
 #include <memory>
 
 enum objType {Bool, Char, Number, String, Pair, Symbol, Procedure};
+enum NumberType { Integer, Rational, Real/*, Complex */};	// First 3 are available now
+
 
 class Object;
 class BoolObj;
@@ -54,11 +56,9 @@ typedef std::shared_ptr<ParseTree> ParseTree_ptr;
 
 class Object
 {
-	private:
+	public:
 
 		objType Type;
-
-	public:
 
 		Object(const objType &T) : Type(T) {}
 
@@ -120,15 +120,9 @@ class CharObj: public Object
 
 class NumberObj: public Object
 {
-	protected:
-		
-		enum NumberType { Integer, Rational, Real/*, Complex */};	// First 3 are available now
-
-	private:
-
-		NumberType numType;
-
 	public:
+		
+		NumberType numType;
 
 		NumberObj(const NumberType & T): Object(Number), numType(T) {}
 
