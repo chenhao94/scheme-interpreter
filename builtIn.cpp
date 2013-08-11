@@ -8,46 +8,187 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 {
 	if (name=="+")
 	{
-		//W.T.F.
+		Para_ptr now = para, last;
+		Obj_ptr ans;
+
+		if (now == NULL)
+			throw syntaxError("at least one arugument");
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		last = now;
+		now = now->next;
+
+		while (now != NULL)
+		{
+			ans = ans + now->obj;
+			last = now;
+			now = now->next;
+		}
+
+		return ans;
 	}
 	else if (name=="-")
 	{
-		//W.T.F.
+		Para_ptr now = para, last;
+		Obj_ptr ans;
+
+		if (now == NULL)
+			throw syntaxError("at least one arugument");
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		last = now;
+		now = now->next;
+
+		while (now != NULL)
+		{
+			ans = ans - now->obj;
+			last = now;
+			now = now->next;
+		}
+
+		return ans;
 	}
 	else if (name=="*")
 	{
-		//W.T.F.
+		Para_ptr now = para, last;
+		Obj_ptr ans;
+
+		if (now == NULL)
+			throw syntaxError("at least one arugument");
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		last = now;
+		now = now->next;
+
+		while (now != NULL)
+		{
+			ans = ans * now->obj;
+			last = now;
+			now = now->next;
+		}
+
+		return ans;
 	}
 	else if (name=="/")
 	{
-		//W.T.F.
+		Para_ptr now = para, last;
+		Obj_ptr ans;
+
+		if (now == NULL)
+			throw syntaxError("at least one arugument");
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		last = now;
+		now = now->next;
+
+		while (now != NULL)
+		{
+			ans = ans / now->obj;
+			last = now;
+			now = now->next;
+		}
+
+		return ans;
 	}
 	else if (name=="<")
 	{
-		Para_ptr para2 = para->next;
+		if (para == NULL)
+			throw syntaxError("at least two aruguments");
 
-		if (para2==NULL || para2->next!=NULL)
-			throw syntaxError("W.T.F.");
+		Para_ptr now = para->next, last = para;
 
-		if (para.Type!=number || para2.Type!=number)
-			throw syntaxError("W.T.F.");
+		if (now == NULL)
+			throw syntaxError("at least two aruguments");
 
 		bool value = false;
-		//W.T.F.
+		
+		while (now != NULL)
+		{
+			value = value && (last->obj < now->obj);
+			last = now;
+			now = now->next;
+		}
+
 		Bool_ptr ptr( new BoolObj(value) );
 		return ptr;
 	}
 	else if (name==">")
 	{
-		//W.T.F.
+		if (para == NULL)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == NULL)
+			throw syntaxError("at least two aruguments");
+
+		bool value = false;
+		
+		while (now != NULL)
+		{
+			value = value && (last->obj > now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
 	}
 	else if (name=="<=")
 	{
-		//W.T.F.
+		if (para == NULL)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == NULL)
+			throw syntaxError("at least two aruguments");
+
+		bool value = false;
+		
+		while (now != NULL)
+		{
+			value = value && (last->obj <= now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
 	}
 	else if (name==">=")
 	{
-		//W.T.F.
+		if (para == NULL)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == NULL)
+			throw syntaxError("at least two aruguments");
+
+		bool value = false;
+		
+		while (now != NULL)
+		{
+			value = value && (last->obj >= now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
 	}
 	else if (name=="gcd")
 	{
@@ -55,11 +196,49 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 	}
 	else if (name=="max")
 	{
-		//W.T.F.
+		Para_ptr now = para;
+		Obj_ptr ans;
+
+		if (now == NULL)
+			throw syntaxError("at least one arugument");
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		now = now->next;
+
+		while (now != NULL)
+		{
+			if (now->obj > ans)
+				ans = now->obj;
+			now = now->next;
+		}
+
+		return ans;
 	}
 	else if (name=="min")
 	{
-		//W.T.F.
+		Para_ptr now = para;
+		Obj_ptr ans;
+
+		if (now == NULL)
+			throw syntaxError("at least one arugument");
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		now = now->next;
+
+		while (now != NULL)
+		{
+			if (now->obj < ans)
+				ans = now->obj;
+			now = now->next;
+		}
+
+		return ans;
 	}
 	else if (name=="exact->inexact")
 	{
@@ -71,7 +250,28 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 	}
 	else if (name=="if")
 	{
-		//W.T.F.
+		Para_ptr test = para, consequence, alternate;
+		
+		if (para == NULL)
+			goto badIfSyntax;
+		consequence = para->next;
+		if (consequence == NULL)
+			goto badIfSyntax;
+		alternate = consequence->next;
+		if (alternate != NULL && alternate->next != NULL)
+			goto badIfSyntax;
+
+		if (false)
+		{
+			badIfSyntax:
+			throw syntaxError("if: bad syntax");
+		}
+
+		if (!( test->obj->Type==Bool && static_cast<BoolObj*>(test->obj.get())->getValue() == false ))
+			return consequence->obj;
+		if (alternate == NULL)
+			return NULL;
+		return alternate->obj;
 	}
 	else if (name=="cond")
 	{
@@ -83,15 +283,36 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 	}
 	else if (name=="cons")
 	{
-		//W.T.F.
+		Para_ptr para1 = para, para2;
+		
+		if (para1 == NULL || para1->next == NULL || para1->next->next != NULL)
+			throw syntaxError("mcons: expect 2 arguments");
+
+		para2 = para->next;
+		Pair_ptr ptr( new PairObj(para1->obj, para2->obj) );
+		return ptr;
 	}
 	else if (name=="car")
 	{
-		//W.T.F.
+		if (para == NULL || para->next != NULL)
+			throw syntaxError("mcar: expect 1 argument");
+		
+		Obj_ptr obj = para->obj.get();
+		if (obj->Type != Pair)
+			throw("unexpected type");
+
+		return static_cast<PairObj*>(obj)->getCar();
 	}
 	else if (name=="cdr")
 	{
-		//W.T.F.
+		if (para == NULL || para->next != NULL)
+			throw syntaxError("mcar: expect 1 argument");
+		
+		Obj_ptr obj = para->obj.get();
+		if (obj->Type != Pair)
+			throw("unexpected type");
+
+		return static_cast<PairObj*>(obj)->getCdr();
 	}
 	else if (name=="define")
 	{
@@ -105,17 +326,49 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 	{
 		//W.T.F.
 	}
-	else if (name=="eq?")
+	else if (name=="eq?" || name=="eqv?")
 	{
-		//W.T.F.
-	}
-	else if (name=="eqv?")
-	{
-		//W.T.F.
+		Para_ptr para1 = para, para2;
+		
+		if (para1 == NULL || para1->next == NULL || para1->next->next != NULL)
+			throw syntaxError("eq? or eqv?: expect 2 arguments");
+
+		para2 = para->next;
+		Obj_ptr obj1 = para1->obj, obj2 = para2->obj;
+		bool value;
+
+		if (obj1->Type != obj2->Type)
+			value = false;
+		else
+			value = (obj1 == obj2);
+
+		Bool_ptr ptr( new BoolObj(value) );
+
+		return ptr;
 	}
 	else if (name=="equal?")
 	{
-		//W.T.F.
+		Para_ptr para1 = para, para2;
+		
+		if (para1 == NULL || para1->next == NULL || para1->next->next != NULL)
+			throw syntaxError("eq? or eqv?: expect 2 arguments");
+
+		para2 = para->next;
+		Obj_ptr obj1 = para1->obj, obj2 = para2->obj;
+		bool value;
+
+		if (obj1->Type != obj2->Type)
+			value = false;
+		else if (obj1->Type != Pair)
+			value = (obj1 == obj2);
+		else
+		{
+			//W.T.F.
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+
+		return ptr;
 	}
 	else if (name=="quote")
 	{

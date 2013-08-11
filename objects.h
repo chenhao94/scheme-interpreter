@@ -290,11 +290,11 @@ class PairObj: public Object
 {
 	private:
 
-		std::shared_ptr<Object> obj1, obj2;
+		Obj_ptr obj1, obj2;
 
 	public:
 
-		PairObj(std::shared_ptr<Object> o1, std::shared_ptr<Object> o2): Object(Pair), obj1(o1), obj2(o2) {}
+		PairObj(Obj_ptr o1, Obj_ptr o2): Object(Pair), obj1(o1), obj2(o2) {}
 
 		virtual ~PairObj() {}
 
@@ -302,9 +302,9 @@ class PairObj: public Object
 
 		std::string ExternalRep();
 
-		std::shared_ptr<Object> getCar() const { return obj1; }
+		Obj_ptr getCar() const { return obj1; }
 
-		std::shared_ptr<Object> getCdr() const { return obj2; }
+		Obj_ptr getCdr() const { return obj2; }
 
 		friend bool operator== (const PairObj &, const PairObj &);
 
