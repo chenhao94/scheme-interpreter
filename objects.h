@@ -55,9 +55,74 @@ typedef std::shared_ptr<Arguments> Arg_ptr;
 typedef std::shared_ptr<Parameters> Para_ptr;
 typedef std::shared_ptr<ParseTree> ParseTree_ptr;
 
+template <class T, class U = typename T::__ObjectBaseType>
+bool operator==(const T &a, const T &b)
+{
+	return (a.getValue() == b.getValue());
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+T operator+ (const T &a, const T &b)
+{
+	T ans(a.getValue() + b.getValue());
+	return ans;
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+T operator- (const T &a, const T &b)
+{
+	T ans(a.getValue() - b.getValue());
+	return ans;
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+T operator* (const T &a, const T &b)
+{
+	T ans(a.getValue() * b.getValue());
+	return ans;
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+T operator/ (const T &a, const T &b)
+{
+	T ans(a.getValue() / b.getValue());
+	return ans;
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+bool operator< (const T &a, const T &b)
+{
+	return (a.getValue() < b.getValue());
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+bool operator> (const T &a, const T &b)
+{
+	return (a.getValue() > b.getValue());
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+bool operator<= (const T &a, const T &b)
+{
+	return (a.getValue() <= b.getValue());
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+bool operator>= (const T &a, const T &b)
+{
+	return (a.getValue() >= b.getValue());
+}
+
+template <class T, class U = typename T::__ObjectBaseType>
+bool operator!= (const T &a, const T &b)
+{
+	return (a.getValue() != b.getValue());
+}
+
 class Object
 {
 	public:
+		typedef int __ObjectBaseType;
 
 		objType Type;
 
@@ -89,11 +154,9 @@ class BoolObj: public Object
 
 		std::string ExternalRep();
 
-		friend bool operator== (BoolObj, BoolObj);
-			
-		friend BoolObj operator&& (BoolObj, BoolObj);
+		friend BoolObj operator&& (const BoolObj &, const BoolObj &);
 
-		friend BoolObj operator|| (BoolObj, BoolObj);
+		friend BoolObj operator|| (const BoolObj &, const BoolObj &);
 
 };
 
@@ -114,8 +177,6 @@ class CharObj: public Object
 		char getValue() const { return value; }
 
 		std::string ExternalRep();
-
-		friend bool operator== (CharObj, CharObj);
 
 };
 
@@ -151,25 +212,9 @@ class IntegerObj: public NumberObj
 
 		std::string ExternalRep();
 
-		friend IntegerObj operator+ (IntegerObj, IntegerObj);
+		friend RationalObj operator/ (const IntegerObj &, const IntegerObj &);
 		
-		friend IntegerObj operator- (IntegerObj, IntegerObj);
-		
-		friend IntegerObj operator* (IntegerObj, IntegerObj);
-		
-		friend RationalObj operator/ (IntegerObj, IntegerObj);
-		
-		friend bool operator< (IntegerObj, IntegerObj);
-		
-		friend bool operator> (IntegerObj, IntegerObj);
-		
-		friend bool operator== (IntegerObj, IntegerObj);
-		
-		friend bool operator<= (IntegerObj, IntegerObj);
-		
-		friend bool operator>= (IntegerObj, IntegerObj);
-		
-		friend bool operator!= (IntegerObj, IntegerObj);
+		friend IntegerObj operator% (const IntegerObj &, const IntegerObj &);
 };
 
 
@@ -197,26 +242,6 @@ class RationalObj: public NumberObj
 
 		std::string ExternalRep();
 
-		friend RationalObj operator+ (RationalObj, RationalObj);
-		
-		friend RationalObj operator- (RationalObj, RationalObj);
-		
-		friend RationalObj operator* (RationalObj, RationalObj);
-		
-		friend RationalObj operator/ (RationalObj, RationalObj);
-		
-		friend bool operator< (RationalObj, RationalObj);
-		
-		friend bool operator> (RationalObj, RationalObj);
-		
-		friend bool operator== (RationalObj, RationalObj);
-		
-		friend bool operator<= (RationalObj, RationalObj);
-		
-		friend bool operator>= (RationalObj, RationalObj);
-		
-		friend bool operator!= (RationalObj, RationalObj);
-
 };
 
 class RealObj: public NumberObj
@@ -239,26 +264,6 @@ class RealObj: public NumberObj
 
 		std::string ExternalRep();
 
-		friend RealObj operator+ (RealObj, RealObj);
-		
-		friend RealObj operator- (RealObj, RealObj);
-		
-		friend RealObj operator* (RealObj, RealObj);
-		
-		friend RealObj operator/ (RealObj, RealObj);
-		
-		friend bool operator< (RealObj, RealObj);
-		
-		friend bool operator> (RealObj, RealObj);
-		
-		friend bool operator== (RealObj, RealObj);
-		
-		friend bool operator<= (RealObj, RealObj);
-		
-		friend bool operator>= (RealObj, RealObj);
-		
-		friend bool operator!= (RealObj, RealObj);
-
 };
 
 class StringObj: public Object
@@ -278,10 +283,6 @@ class StringObj: public Object
 		std::string getValue() const { return value; }
 
 		std::string ExternalRep();
-
-		friend bool operator== (StringObj, StringObj);
-
-		friend StringObj operator+ (StringObj, StringObj);
 
 };
 
@@ -304,6 +305,9 @@ class PairObj: public Object
 		std::shared_ptr<Object> getCar() const { return obj1; }
 
 		std::shared_ptr<Object> getCdr() const { return obj2; }
+
+		friend bool operator== (const PairObj &, const PairObj &);
+
 };
 
 class SymbolObj: public Object
@@ -374,5 +378,7 @@ class Parameters
 
 		Parameters(const Obj_ptr & o): obj(o), next(NULL) {}
 };
+
+bool operator== (const Obj_ptr &, const Obj_ptr &);
 
 #endif
