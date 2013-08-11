@@ -17,6 +17,7 @@
 #ifndef  __OBJECTS_H____
 #define  __OBJECTS_H____
 #include "useGMP.h"
+#include "compilingError.h"
 #include <string>
 #include <memory>
 

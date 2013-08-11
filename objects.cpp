@@ -171,6 +171,12 @@ RationalObj operator/ (IntegerObj a, IntegerObj b)
 	return ans;
 }
 
+IntegerObj operator% (IntegerObj a, IntegerObj b)
+{
+	IntegerObj ans(a.value % b.value);
+	return ans;
+}
+
 template <class T>
 bool operator< (T a, T b)
 {
@@ -203,29 +209,226 @@ bool operator!= (T a, T b)
 
 bool operator== (Obj_ptr aPtr, Obj_ptr bPtr)
 {
-	Object *a=aPtr.get(), *b=bPtr.get();
-	if (a->Type!=b->Type)
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != b->Type)
 		return false;
-	if (a->Type==Bool)
+	if (a->Type == Bool)
 		return operator==( *static_cast<Object::BoolObj*>(a), *static_cast<Object::BoolObj*>(b) );
-	if (a->Type==Char)
+	if (a->Type == Char)
 		return operator==( *static_cast<Object::CharObj*>(a), *static_cast<Object::CharObj*>(b) );
-	if (a->Type==Number)
+	if (a->Type == Number)
 	{
 		NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
-		if (aT==Real || bT==Real)
+		if (aT == Real || bT == Real)
 			return operator==( *static_cast<Object::RealObj*>(a), *static_cast<Object::RealObj*>(b) );
-		if (aT==Rational || bT==Rational)
+		if (aT == Rational || bT == Rational)
 			return operator==( *static_cast<Object::RationalObj*>(a), *static_cast<Object::RationalObj*>(b) );
 		return operator==( *static_cast<Object::IntegerObj*>(a), *static_cast<Object::IntegerObj*>(b) );
 
 	}
-	if (a->Type==String)
+	if (a->Type == String)
 		return operator==( *static_cast<Object::StringObj*>(a), *static_cast<Object::StringObj*>(b) );
-	if (a->Type==Pair)
+	if (a->Type == Pair)
 		return operator==( *static_cast<Object::PairObj*>(a), *static_cast<Object::PairObj*>(b) );
-	if (a->Type==Symbol)
+	if (a->Type == Symbol)
 		return operator==( *static_cast<Object::SymbolObj*>(a), *static_cast<Object::SymbolObj*>(b) );
-	if (a->Type==Procedure)
+	if (a->Type == Procedure)
 		return a==b;
 }
+
+bool operator!= (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	return !operator==(aPtr, bPtr);
+}
+
+bool operator< (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Number || B->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+		return operator<( *static_cast<Object::RealObj*>(a), *static_cast<Object::RealObj*>(b) );
+	if (aT == Rational || bT == Rational)
+		return operator<( *static_cast<Object::RationalObj*>(a), *static_cast<Object::RationalObj*>(b) );
+	return operator<( *static_cast<Object::IntegerObj*>(a), *static_cast<Object::IntegerObj*>(b) );
+}
+
+bool operator> (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type!=Number || B->Type!=Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+		return operator>( *static_cast<Object::RealObj*>(a), *static_cast<Object::RealObj*>(b) );
+	if (aT == Rational || bT == Rational)
+		return operator>( *static_cast<Object::RationalObj*>(a), *static_cast<Object::RationalObj*>(b) );
+	return operator>( *static_cast<Object::IntegerObj*>(a), *static_cast<Object::IntegerObj*>(b) );
+}
+
+bool operator<= (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Number || B->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+		return operator<=( *static_cast<Object::RealObj*>(a), *static_cast<Object::RealObj*>(b) );
+	if (aT == Rational || bT == Rational)
+		return operator<=( *static_cast<Object::RationalObj*>(a), *static_cast<Object::RationalObj*>(b) );
+	return operator<=( *static_cast<Object::IntegerObj*>(a), *static_cast<Object::IntegerObj*>(b) );
+}
+
+bool operator>= (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Number || B->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+		return operator>=( *static_cast<Object::RealObj*>(a), *static_cast<Object::RealObj*>(b) );
+	if (aT == Rational || bT == Rational)
+		return operator>=( *static_cast<Object::RationalObj*>(a), *static_cast<Object::RationalObj*>(b) );
+	return operator>=( *static_cast<Object::IntegerObj*>(a), *static_cast<Object::IntegerObj*>(b) );
+}
+
+Obj_ptr operator+ (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+
+	if (a->Type == String && b->Type == String)
+	{
+		String_ptr ptr( new StringObj( *static_cast<Object::StringObj*>(a) + *static_cast<Object::StringObj*>(b) ) );
+		return ptr;
+	}
+
+	if (a->Type != Number || b->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+	{
+		Real_ptr ptr( new RealObj( *static_cast<Object::RealObj*>(a) + *static_cast<Object::RealObj*>(b) ) );
+		return ptr;
+	}
+	if (aT == Rational || bT == Rational)
+	{
+		Rational_ptr ptr( new RationalObj( *static_cast<Object::RationalObj*>(a) + *static_cast<Object::RationalObj*>(b) ) );
+		return ptr;
+	}
+	Int_ptr ptr( new IntegerObj( *static_cast<Object::IntegerObj*>(a) + *static_cast<Object::IntegerObj*>(b) ) );
+	return ptr;
+}
+
+Obj_ptr operator- (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Number || B->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+	{
+		Real_ptr ptr( new RealObj( *static_cast<Object::RealObj*>(a) - *static_cast<Object::RealObj*>(b) ) );
+		return ptr;
+	}
+	if (aT == Rational || bT == Rational)
+	{
+		Rational_ptr ptr( new RationalObj( *static_cast<Object::RationalObj*>(a) - *static_cast<Object::RationalObj*>(b) ) );
+		return ptr;
+	}
+	Int_ptr ptr( new IntegerObj( *static_cast<Object::IntegerObj*>(a) - *static_cast<Object::IntegerObj*>(b) ) );
+	return ptr;
+}
+
+Obj_ptr operator* (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Number || B->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+	{
+		Real_ptr ptr( new RealObj( *static_cast<Object::RealObj*>(a) * *static_cast<Object::RealObj*>(b) ) );
+		return ptr;
+	}
+	if (aT == Rational || bT == Rational)
+	{
+		Rational_ptr ptr( new RationalObj( *static_cast<Object::RationalObj*>(a) * *static_cast<Object::RationalObj*>(b) ) );
+		return ptr;
+	}
+	Int_ptr ptr( new IntegerObj( *static_cast<Object::IntegerObj*>(a) * *static_cast<Object::IntegerObj*>(b) ) );
+	return ptr;
+}
+
+Obj_ptr operator/ (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Number || B->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT == Real || bT == Real)
+	{
+		Real_ptr ptr( new RealObj( *static_cast<Object::RealObj*>(a) / *static_cast<Object::RealObj*>(b) ) );
+		return ptr;
+	}
+	if (aT == Rational || bT == Rational)
+	{
+		Rational_ptr ptr( new RationalObj( *static_cast<Object::RationalObj*>(a) / *static_cast<Object::RationalObj*>(b) ) );
+		return ptr;
+	}
+	Rational_ptr ptr( new RationalObj( *static_cast<Object::IntegerObj*>(a) / *static_cast<Object::IntegerObj*>(b) ) );
+	return ptr;
+}
+
+Obj_ptr operator% (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Number || B->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT(static_cast<Object::NumberObj*>(a->numType)), bT(static_cast<Object::NumberObj*>(b->numType));
+	if (aT != Integer || bT != Integer)
+		throw syntaxError("Unexpected type");
+
+	Integer_ptr ptr( new IntegerObj( *static_cast<Object::IntegerObj*>(a) % *static_cast<Object::IntegerObj*>(b) ) );
+	return ptr;
+}
+
+Obj_ptr operator! (Obj_ptr aPtr)
+{
+	Object *a = aPtr.get();
+	if (a->Type != Bool)
+		throw syntaxError("Unexpected type");
+	
+	Bool_ptr ptr( new BoolObj( !( *static_cast<Object::BoolObj*>(a) ) ) );
+	return ptr;
+}
+
+Obj_ptr operator&& (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Bool || b->Type !=Bool)
+		throw syntaxError("Unexpected type");
+	
+	Bool_ptr ptr( new BoolObj(  *static_cast<Object::BoolObj*>(a) && *static_cast<Object::BoolObj*>(b)  ) );
+	return ptr;
+}
+
+Obj_ptr operator|| (Obj_ptr aPtr, Obj_ptr bPtr)
+{
+	Object *a = aPtr.get(), *b = bPtr.get();
+	if (a->Type != Bool || b->Type !=Bool)
+		throw syntaxError("Unexpected type");
+	
+	Bool_ptr ptr( new BoolObj(  *static_cast<Object::BoolObj*>(a) || *static_cast<Object::BoolObj*>(b)  ) );
+	return ptr;
+}
+
