@@ -12,7 +12,6 @@
 #include <memory>
 
 class Environment;
-typedef std::shared_ptr<Object> Obj_ptr;
 typedef std::map<std::string, Obj_ptr> Obj_map;
 typedef std::shared_ptr<Environment> env_ptr;
 

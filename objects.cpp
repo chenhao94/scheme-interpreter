@@ -127,7 +127,7 @@ IntegerObj operator% (const IntegerObj &a, const IntegerObj &b)
 	return ans;
 }
 
-bool operator== (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+bool equal (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != b->Type)
@@ -156,9 +156,9 @@ bool operator== (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 		return a==b;
 }
 
-bool operator!= (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	return !operator==(aPtr, bPtr);
+	return !equal(aPtr, bPtr);
 }
 
 bool operator< (const Obj_ptr &aPtr, const Obj_ptr &bPtr)

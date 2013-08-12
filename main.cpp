@@ -1,11 +1,8 @@
 #include <iostream>
 #include <string>
 #include "extract.h"
-#include "objects.h"
-#include "environments.h"
 #include "parse.h"
 #include "execute.h"
-#include "builtIn.h"
 #include "compilingError.h"
 
 int main()

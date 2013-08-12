@@ -24,7 +24,6 @@
 enum objType {Bool, Char, Number, String, Pair, Symbol, Procedure};
 enum NumberType { Integer, Rational, Real/*, Complex */};	// First 3 are available now
 
-
 class Object;
 class BoolObj;
 class CharObj;
@@ -54,6 +53,21 @@ typedef std::shared_ptr<ProcedureObj> Procedure_ptr;
 typedef std::shared_ptr<Arguments> Arg_ptr;
 typedef std::shared_ptr<Parameters> Para_ptr;
 typedef std::shared_ptr<ParseTree> ParseTree_ptr;
+
+bool equal (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool operator< (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool operator> (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool operator<= (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool operator>= (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr operator+ (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr operator- (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr operator* (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr operator/ (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr operator% (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr operator! (const Obj_ptr &aPtr);
+Obj_ptr operator&& (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr operator|| (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 
 template <class T, class U = typename T::__ObjectBaseType>
 bool operator==(const T &a, const T &b)
@@ -368,17 +382,13 @@ class Arguments
 
 class Parameters
 {
-	private:
+	public:
 
 		Obj_ptr obj;
-
-	public:
 
 		Para_ptr next;
 
 		Parameters(const Obj_ptr & o): obj(o), next(NULL) {}
 };
-
-bool operator== (const Obj_ptr &, const Obj_ptr &);
 
 #endif

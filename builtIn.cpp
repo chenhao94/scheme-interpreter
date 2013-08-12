@@ -264,7 +264,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (para == NULL || para->next != NULL)
 			throw syntaxError("mcar: expect 1 argument");
 		
-		Obj_ptr obj = para->obj.get();
+		Object* obj = para->obj.get();
 		if (obj->Type != Pair)
 			throw("unexpected type");
 
@@ -275,7 +275,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (para == NULL || para->next != NULL)
 			throw syntaxError("mcar: expect 1 argument");
 		
-		Obj_ptr obj = para->obj.get();
+		Object *obj = para->obj.get();
 		if (obj->Type != Pair)
 			throw("unexpected type");
 
@@ -295,7 +295,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (obj1->Type != obj2->Type)
 			value = false;
 		else
-			value = (obj1 == obj2);
+			value = equal(obj1, obj2);
 
 		Bool_ptr ptr( new BoolObj(value) );
 
@@ -315,9 +315,9 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (obj1->Type != obj2->Type)
 			value = false;
 		else if (obj1->Type != Pair)
-			value = (obj1 == obj2);
+			value = equal(obj1, obj2);
 		else
-			value = (obj1->ExternalRep() == obj2->ExternalRep())
+			value = (obj1->ExternalRep() == obj2->ExternalRep());
 
 		Bool_ptr ptr( new BoolObj(value) );
 
@@ -346,13 +346,13 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 			throw syntaxError("if: bad syntax");
 		}
 
-		Obj_ptr testObj = evaluate(test);
+		Obj_ptr testObj = evaluate(test, env);
 
 		if (!( testObj->Type==Bool && static_cast<BoolObj*>(testObj.get())->getValue() == false ))
-			return evalauate(consequence);
+			return evaluate(consequence, env);
 		if (alternate == NULL)
 			return NULL;
-		return evaluate(alternate);
+		return evaluate(alternate, env);
 	}
 	else if (name=="cond")
 	{
@@ -377,7 +377,7 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 		if (!idenFlag)
 			throw syntaxError("define: bad identifier: " + iden);
 
-		env.DefineObj( iden, evaluate(tree->getBrother) );
+		env->DefineObj( iden, evaluate(tree->getBrother(), env) );
 		return NULL;
 	}
 	else if (name=="set!")
@@ -394,9 +394,9 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 		env_ptr envTmp = env;
 		while (envTmp)
 		{
-			if (envTmp.FindObj(iden) != NULL)
+			if (envTmp->FindObj(iden) != NULL)
 			{
-				envTmp.DefineObj( iden, evaluate(tree->getBrother) );
+				envTmp->DefineObj( iden, evaluate(tree->getBrother(), env) );
 				return NULL;
 			}
 			envTmp = envTmp->next;

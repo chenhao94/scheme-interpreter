@@ -5,7 +5,7 @@
 #include "execute.h"
 #include <cctype>
 
-Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
+Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 {
 	std::string token = root->getToken();
 	Obj_ptr obj;
@@ -19,13 +19,13 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 	{
 		//----integer-----
 		if (!rationalFlag && !realFlag)
-			obj = new IntegerObj(token);
+			obj = Obj_ptr( new IntegerObj(token) );
 		//----rational----
 		else if (rationalFlag)
-			obj = new RationalObj(token);
+			obj = Obj_ptr( new RationalObj(token) );
 		//----real--------
 		else
-			obj = new RealObj(token);
+			obj = Obj_ptr( new RealObj(token) );
 		return obj;
 	}
 
@@ -33,9 +33,9 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 	else if (idenFlag)
 	{
 		obj = findIden(env);
-		if (obj==NULL)
+		if (obj == NULL)
 			throw syntaxError("Undefined identifier: " + token);
-		return obGj;
+		return obj;
 	}
 
 	//----char&bool-----
@@ -45,13 +45,13 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 		if (token[1]=='\\')
 		{
 			if (token=="#\\newline")
-				obj = new CharObj('\n');
+				obj = Obj_ptr( new CharObj('\n') );
 			else if (token=="#\\space")
-				obj = new CharObj(' ');
+				obj = Obj_ptr( new CharObj(' ') );
 			else if (token="#\\tab")
-				obj = new CharObj('\t');
+				obj = Obj_ptr( new CharObj('\t') );
 			else
-				obj = new CharObj(token[2]);
+				obj = Obj_ptr( new CharObj(token[2]) );
 
 			return obj;
 		}
@@ -60,9 +60,9 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 		{
 			
 			if (token[1]=='t')
-				obj = new BoolObj(true);
+				obj = Obj_ptr( new BoolObj(true) );
 			else
-				obj = new BoolObj(false);
+				obj = Obj_ptr( new BoolObj(false) );
 
 			return obj;
 		}
@@ -71,7 +71,7 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 	//----string-------
 	else if (token[0]=='\"')
 	{
-		obj = new StringObj(token.substr(1, npos-1));
+		obj = Obj_ptr( new StringObj(token.substr(1, std::string::npos-1)) );
 		return obj;
 	}
 
@@ -106,19 +106,19 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 			throw syntaxError("\'" + iden + "\' is not a procedure");
 
 		ParseTree_ptr para = name->getBrother();
-		Parameter_ptr head=NULL, tail=NULL;
+		Para_ptr head=NULL, tail=NULL;
 
 		while (para!=NULL)
 		{
 			if (head==NULL)
 			{
-				head = new Parameters(evaluate(para));
+				head = Para_ptr( new Parameters(evaluate(para, env)) );
 				tail = head;
 			}
 			else
 			{
-				tail.next = new Parameters(evaluate(para));
-				tail = tail.next;
+				tail->next = Para_ptr( new Parameters(evaluate(para, env)) );
+				tail = tail->next;
 			}
 
 			para = para->getBrother();
@@ -144,12 +144,12 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 
 }
 
-Obj_ptr findIden(env_ptr env, const std::string &name);
+Obj_ptr findIden(env_ptr env, const std::string &name)
 {
 	Obj_ptr obj;
 	while (env!=NULL)
 	{
-		obj = env.FindObj(name);
+		obj = env->FindObj(name);
 		if (obj!=NULL)
 			return obj;
 		env = env->next;
