@@ -5,12 +5,6 @@
 #include "execute.h"
 #include <cctype>
 
-void checkToken(const std::string &, bool &, bool &, bool &, bool &);
-
-Obj_ptr findIden(env_ptr env, const std::string&);
-
-Obj_ptr evaluateUserDefined(const Obj_ptr &, const Para_ptr);
-
 Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 {
 	std::string token = root->getToken();
@@ -92,13 +86,21 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 	{
 		ParseTree_ptr name = root->getSon();
 		std::string iden = name->getToken();
+
+		//--------syntax------------
+		if (builtInSyntax.find(iden) != builtInSyntax.end())
+		{
+			return evaluateSyntax(iden, name, env);
+		}
+		
+		//--------procedure---------
+
 		Obj_ptr obj = findIden(env, iden);
 
 		if (obj==NULL)
 		{
-			// use set to check if it is a built-in keyword
-			// W.T.F.
-			throw syntaxError("Undefined identifier: " + iden);
+			if (builtInProcedure.find(iden) == builtInProcedure.end())
+				throw syntaxError("Undefined identifier: " + iden);
 		}
 		else if (obj->Type != Procedure)
 			throw syntaxError("\'" + iden + "\' is not a procedure");
@@ -124,11 +126,12 @@ Obj_ptr evaluate(ParseTree_ptr root, const env_ptr & env)
 
 		if (obj)	//define by user
 		{
-			return evaluateUserDefined(obj, head);
+			// !!!!!!!ENVIRONMENT!!!!!!!!
+			return evaluateUserDefined(obj, head, env);
 		}
 		else		// built-in
 		{
-			return evaluateBuiltIn(iden, head);
+			return evaluateBuiltInProcedure(iden, head, env);
 		}
 
 	}
@@ -159,38 +162,30 @@ void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, 
 
 	int token_size = token.size();
 
-	if (!isalpha(token[0]))
-		idenFlag = false;
+	idenFlag = false;
+	numberFlag = true;
+	rationalFlag = realFlag = false;
+
 	if (!isdigit(token[0]) && token[0]!='.')
 		numberFlag = false;
 	if (token[token_size-1]=='/')
 		numberFlag = false;
 
-	if (idenFlag)
-	{
-		for (int i=1; i<token_size; ++i)
-			if (!isdigit(token[i]) && !isalpha(token[i]) && token[i]!='_')
-			{
-				idenFlag = false;
-				return;
-			}
-
-	}
-	else if (numberFlag)
+	if (numberFlag)
 	{
 		for (int i=0; i<token_size; ++i)
 		{
 			if (!isdigit(token[i]) && token[i]!='.' && token[i]!='/')
 			{
 				numberFlag = false;
-				return;
+				break;
 			}
 			if (token[i]=='.')
 			{
 				if (realFlag || rationalFlag)
 				{
 					numberFlag = false;
-					return;
+					break;
 				}
 				realFlag = true;
 			}
@@ -199,11 +194,28 @@ void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, 
 				if (realFlag || rationalFlag)
 				{
 					numberFlag = false;
-					return;
+					break;
 				}
 				rationalFlag = true;
 			}
 		}
 	}
+	
+	if (!numberFlag)
+	{
+		idenFlag = true;
+		if (token[0] == '#')
+			idenFlag = false;
+		else
+			for (int i=0; i<token_size; ++i)
+				if (token[i]=='(' || token[i]==')' || token[i]=='\"' || token[i]=='`' || token[i]=='\'')
+				{
+					idenFlag = false;
+					break;
+				}
+
+	}
+
+	return;
 }
 

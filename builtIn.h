@@ -7,14 +7,19 @@
 #include "objects.h"
 #include "parse.h"
 #include "environments.h"
+#include "execute.h"
 #include "compilingError.h"
 #include <string>
 #include <set>
 
 typedef std::set<std::string> builtInSet;
 
-std::string builtInName[50]={"+","-","*","/","<",">","<=",">=","gcd","max","min","exact->inexact","inexact->exact","if","cond","else","cons","car","cdr","define","set!","lambda","eq?","eqv?","equal?","quote","quasiquote"};
+builtInSet builtInSyntax({ "if","cond","case","else","define","set!","lambda","quote","quasiquote" });
 
-Obj_ptr evaluateBuiltIn(const std::string &, const Para_ptr&);
+builtInSet builtInProcedure({"+","-","*","/","<",">","<=",">=","gcd","max","min","exact->inexact","inexact->exact","cons","car","cdr","eq?","eqv?","equal?"});
+
+Obj_ptr evaluateBuiltInProcedure(const std::string &, const Para_ptr&, env_ptr &);
+
+Obj_ptr evaluateSyntax(const std::string &, const ParseTree_ptr &, env_ptr &);
 
 #endif

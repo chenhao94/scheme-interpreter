@@ -4,7 +4,7 @@
 
 #include "builtIn.h"
 
-Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
+Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, env_ptr & env)
 {
 	if (name=="+")
 	{
@@ -248,39 +248,6 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 	{
 		//W.T.F.
 	}
-	else if (name=="if")
-	{
-		Para_ptr test = para, consequence, alternate;
-		
-		if (para == NULL)
-			goto badIfSyntax;
-		consequence = para->next;
-		if (consequence == NULL)
-			goto badIfSyntax;
-		alternate = consequence->next;
-		if (alternate != NULL && alternate->next != NULL)
-			goto badIfSyntax;
-
-		if (false)
-		{
-			badIfSyntax:
-			throw syntaxError("if: bad syntax");
-		}
-
-		if (!( test->obj->Type==Bool && static_cast<BoolObj*>(test->obj.get())->getValue() == false ))
-			return consequence->obj;
-		if (alternate == NULL)
-			return NULL;
-		return alternate->obj;
-	}
-	else if (name=="cond")
-	{
-		//W.T.F.
-	}
-	else if (name=="else")
-	{
-		//W.T.F.
-	}
 	else if (name=="cons")
 	{
 		Para_ptr para1 = para, para2;
@@ -313,18 +280,6 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 			throw("unexpected type");
 
 		return static_cast<PairObj*>(obj)->getCdr();
-	}
-	else if (name=="define")
-	{
-		//W.T.F.
-	}
-	else if (name=="set!")
-	{
-		//W.T.F.
-	}
-	else if (name=="lambda")
-	{
-		//W.T.F.
 	}
 	else if (name=="eq?" || name=="eqv?")
 	{
@@ -362,13 +317,96 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 		else if (obj1->Type != Pair)
 			value = (obj1 == obj2);
 		else
-		{
-			//W.T.F.
-		}
+			value = (obj1->ExternalRep() == obj2->ExternalRep())
 
 		Bool_ptr ptr( new BoolObj(value) );
 
 		return ptr;
+	}
+}
+
+Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_ptr &env)
+{
+	if (name=="if")
+	{
+		ParseTree_ptr test = tree, consequence, alternate;
+		
+		if (test == NULL)
+			goto badIfSyntax;
+		consequence = test->getBrother();
+		if (consequence == NULL)
+			goto badIfSyntax;
+		alternate = consequence->getBrother();
+		if (alternate != NULL && alternate->getBrother() != NULL)
+			goto badIfSyntax;
+
+		if (false)
+		{
+			badIfSyntax:
+			throw syntaxError("if: bad syntax");
+		}
+
+		Obj_ptr testObj = evaluate(test);
+
+		if (!( testObj->Type==Bool && static_cast<BoolObj*>(testObj.get())->getValue() == false ))
+			return evalauate(consequence);
+		if (alternate == NULL)
+			return NULL;
+		return evaluate(alternate);
+	}
+	else if (name=="cond")
+	{
+		//W.T.F.
+	}
+	else if (name=="case")
+	{
+		//W.T.F.
+	}
+	else if (name=="else")
+	{
+		//W.T.F.
+	}
+	else if (name=="define")
+	{
+		std::string iden = tree->getToken();
+		if (tree->getSon() != NULL || tree->getBrother() == NULL || tree->getBrother()->getBrother() != NULL)
+			throw syntaxError("define: bad syntax(missing expression or multiple expression)");
+
+		bool idenFlag, tmp1, tmp2, tmp3;
+		checkToken(iden, tmp1, tmp2, tmp3, idenFlag);
+		if (!idenFlag)
+			throw syntaxError("define: bad identifier: " + iden);
+
+		env.DefineObj( iden, evaluate(tree->getBrother) );
+		return NULL;
+	}
+	else if (name=="set!")
+	{
+		std::string iden = tree->getToken();
+		if (tree->getSon() != NULL || tree->getBrother() == NULL || tree->getBrother()->getBrother() != NULL)
+			throw syntaxError("set!: bad syntax(missing expression or multiple expression)");
+
+		bool idenFlag, tmp1, tmp2, tmp3;
+		checkToken(iden, tmp1, tmp2, tmp3, idenFlag);
+		if (!idenFlag)
+			throw syntaxError("set!: bad identifier: " + iden);
+
+		env_ptr envTmp = env;
+		while (envTmp)
+		{
+			if (envTmp.FindObj(iden) != NULL)
+			{
+				envTmp.DefineObj( iden, evaluate(tree->getBrother) );
+				return NULL;
+			}
+			envTmp = envTmp->next;
+		}
+
+		throw syntaxError("undefined variable: " + iden);
+	}
+	else if (name=="lambda")
+	{
+		//W.T.F.
 	}
 	else if (name=="quote")
 	{
@@ -378,5 +416,4 @@ Obj_ptr evaluateBuiltIn(const std::string &name, const Para_ptr &para);
 	{
 		//W.T.F.
 	}
-
 }
