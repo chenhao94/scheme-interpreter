@@ -56,18 +56,18 @@ typedef std::shared_ptr<ParseTree> ParseTree_ptr;
 
 bool equal (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-bool operator< (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-bool operator> (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-bool operator<= (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-bool operator>= (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr operator+ (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr operator- (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr operator* (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr operator/ (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr operator% (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr operator! (const Obj_ptr &aPtr);
-Obj_ptr operator&& (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr operator|| (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool lessThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool greaterThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool lessEq (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+bool greaterEq (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Add (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Subtract (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Multiply (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Divide (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Module (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Not (const Obj_ptr &aPtr);
+Obj_ptr And (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 
 template <class T, class U = typename T::__ObjectBaseType>
 bool operator==(const T &a, const T &b)

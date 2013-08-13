@@ -23,7 +23,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		while (now != NULL)
 		{
-			ans = ans + now->obj;
+			ans = Add(ans, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -47,7 +47,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		while (now != NULL)
 		{
-			ans = ans - now->obj;
+			ans = Subtract(ans, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -71,7 +71,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		while (now != NULL)
 		{
-			ans = ans * now->obj;
+			ans = Multiply(ans, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -95,7 +95,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		while (now != NULL)
 		{
-			ans = ans / now->obj;
+			ans = Divide(ans, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -116,7 +116,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		
 		while (now != NULL)
 		{
-			value = value && (last->obj < now->obj);
+			value = value && lessThan(last->obj, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -138,7 +138,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		
 		while (now != NULL)
 		{
-			value = value && (last->obj > now->obj);
+			value = value && greaterThan(last->obj, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -160,7 +160,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		
 		while (now != NULL)
 		{
-			value = value && (last->obj <= now->obj);
+			value = value && lessEq(last->obj, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -182,7 +182,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		
 		while (now != NULL)
 		{
-			value = value && (last->obj >= now->obj);
+			value = value && greaterEq(last->obj, now->obj);
 			last = now;
 			now = now->next;
 		}
@@ -210,7 +210,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		while (now != NULL)
 		{
-			if (now->obj > ans)
+			if ( greaterThan(now->obj, ans) )
 				ans = now->obj;
 			now = now->next;
 		}
@@ -233,7 +233,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		while (now != NULL)
 		{
-			if (now->obj < ans)
+			if ( lessThan(now->obj, ans) )
 				ans = now->obj;
 			now = now->next;
 		}

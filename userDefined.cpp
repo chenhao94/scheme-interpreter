@@ -4,7 +4,7 @@
 
 #include "userDefined.h"
 
-Obj_ptr evaluateUserDefined( const std::string &name, const Para_ptr & para, env_ptr & env)
+Obj_ptr evaluateUserDefined( const Obj_ptr &func, const Para_ptr & para, env_ptr & env)
 {
 	//W.T.F.
 }

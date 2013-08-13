@@ -5,6 +5,10 @@
 #include "execute.h"
 #include <cctype>
 
+builtInSet builtInSyntax({ "if","cond","case","else","define","set!","lambda","quote","quasiquote" });
+
+builtInSet builtInProcedure({"+","-","*","/","<",">","<=",">=","gcd","max","min","exact->inexact","inexact->exact","cons","car","cdr","eq?","eqv?","equal?"});
+
 Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 {
 	std::string token = root->getToken();
@@ -19,21 +23,21 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 	{
 		//----integer-----
 		if (!rationalFlag && !realFlag)
-			obj = Obj_ptr( new IntegerObj(token) );
+			obj = Obj_ptr( new IntegerObj( bigInteger(token) ) );
 		//----rational----
 		else if (rationalFlag)
-			obj = Obj_ptr( new RationalObj(token) );
+			obj = Obj_ptr( new RationalObj( bigRational(token) ) );
 		//----real--------
 		else
-			obj = Obj_ptr( new RealObj(token) );
+			obj = Obj_ptr( new RealObj( bigReal(token) ) );
 		return obj;
 	}
 
 	//----identifier----
 	else if (idenFlag)
 	{
-		obj = findIden(env);
-		if (obj == NULL)
+		obj = findIden(env, token);
+		if (obj.get() == NULL)
 			throw syntaxError("Undefined identifier: " + token);
 		return obj;
 	}
@@ -48,7 +52,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 				obj = Obj_ptr( new CharObj('\n') );
 			else if (token=="#\\space")
 				obj = Obj_ptr( new CharObj(' ') );
-			else if (token="#\\tab")
+			else if (token=="#\\tab")
 				obj = Obj_ptr( new CharObj('\t') );
 			else
 				obj = Obj_ptr( new CharObj(token[2]) );

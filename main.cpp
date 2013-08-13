@@ -9,10 +9,12 @@ int main()
 {
 	using namespace std;
 
-	string cache, tmp, sentence;
-	ParseTree_ptr tree = NULL;
 	bool cacheEndFlag = false;
+	char tmp[205];
+	string cache, sentence;
 	Obj_ptr obj;
+	ParseTree_ptr tree = NULL;
+	env_ptr env(new Environment() );
 
 	while (!cin.eof())
 	{
@@ -26,7 +28,7 @@ int main()
 			{
 				extract(sentence, cache, cacheEndFlag);
 				tree = Parsing(sentence);
-				obj = evaluate(tree);
+				obj = evaluate(tree, env);
 				if (obj != NULL)
 					cout << obj->ExternalRep() << endl;
 			}

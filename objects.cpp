@@ -161,7 +161,7 @@ bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return !equal(aPtr, bPtr);
 }
 
-bool operator< (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+bool lessThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Number || b->Type != Number)
@@ -175,7 +175,7 @@ bool operator< (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return operator<( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
 }
 
-bool operator> (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+bool greaterThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type!=Number || b->Type!=Number)
@@ -189,7 +189,7 @@ bool operator> (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return operator>( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
 }
 
-bool operator<= (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+bool lessEq (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Number || b->Type != Number)
@@ -203,7 +203,7 @@ bool operator<= (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return operator<=( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
 }
 
-bool operator>= (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+bool greaterEq (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Number || b->Type != Number)
@@ -217,7 +217,7 @@ bool operator>= (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return operator>=( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
 }
 
-Obj_ptr operator+ (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr Add (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 
@@ -245,7 +245,7 @@ Obj_ptr operator+ (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return ptr;
 }
 
-Obj_ptr operator- (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr Subtract (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Number || b->Type != Number)
@@ -266,7 +266,7 @@ Obj_ptr operator- (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return ptr;
 }
 
-Obj_ptr operator* (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr Multiply (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Number || b->Type != Number)
@@ -287,7 +287,7 @@ Obj_ptr operator* (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return ptr;
 }
 
-Obj_ptr operator/ (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr Divide (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Number || b->Type != Number)
@@ -308,7 +308,7 @@ Obj_ptr operator/ (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return ptr;
 }
 
-Obj_ptr operator% (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr Module (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Number || b->Type != Number)
@@ -322,7 +322,7 @@ Obj_ptr operator% (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return ptr;
 }
 
-Obj_ptr operator! (const Obj_ptr &aPtr)
+Obj_ptr Not (const Obj_ptr &aPtr)
 {
 	Object *a = aPtr.get();
 	if (a->Type != Bool)
@@ -332,7 +332,7 @@ Obj_ptr operator! (const Obj_ptr &aPtr)
 	return ptr;
 }
 
-Obj_ptr operator&& (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr And (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Bool || b->Type !=Bool)
@@ -342,7 +342,7 @@ Obj_ptr operator&& (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return ptr;
 }
 
-Obj_ptr operator|| (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *a = aPtr.get(), *b = bPtr.get();
 	if (a->Type != Bool || b->Type !=Bool)
