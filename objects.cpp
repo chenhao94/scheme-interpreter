@@ -137,6 +137,8 @@ std::string StringObj::ExternalRep()
 
 std::string PairObj::ExternalRep()
 {
+	if ( obj1 == NULL && obj2 == NULL)
+		return "( )";
 	return "( " + obj1->ExternalRep() + "  " + obj2->ExternalRep() + " )";
 }
 
