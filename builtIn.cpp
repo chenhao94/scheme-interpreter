@@ -112,7 +112,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (now == NULL)
 			throw syntaxError("at least two aruguments");
 
-		bool value = false;
+		bool value = true;
 		
 		while (now != NULL)
 		{
@@ -134,7 +134,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (now == NULL)
 			throw syntaxError("at least two aruguments");
 
-		bool value = false;
+		bool value = true;
 		
 		while (now != NULL)
 		{
@@ -156,7 +156,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (now == NULL)
 			throw syntaxError("at least two aruguments");
 
-		bool value = false;
+		bool value = true;
 		
 		while (now != NULL)
 		{
@@ -178,7 +178,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		if (now == NULL)
 			throw syntaxError("at least two aruguments");
 
-		bool value = false;
+		bool value = true;
 		
 		while (now != NULL)
 		{

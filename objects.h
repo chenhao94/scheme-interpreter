@@ -288,7 +288,7 @@ class StringObj: public Object
 
 	public:
 
-		StringObj(std::string s): Object(String), value(s) {}
+		StringObj(std::string);
 
 		virtual ~StringObj() {}
 

@@ -9,6 +9,46 @@
 #include <string>
 #include <sstream>
 
+#include <iostream>//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!!!!!!!!!!!!!!!!!!!!!!!!
+/*
+RealObj operator+ (const RealObj &a, const RealObj &b)
+{
+	using namespace std;			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	cout << "debugging!!" <<endl;
+	bigReal aa = a.getValue();
+	cout << aa << endl;
+	cout << b.getValue() << endl;
+	cout << a.getValue() + b.getValue() << endl;
+	RealObj ans(a.getValue() + b.getValue());
+	return ans;
+}
+*/
+
+StringObj::StringObj(std::string s): Object(String)
+{
+	int pos = 0;
+
+	while (1)
+	{
+		pos = s.find('\\', pos);
+		if (pos == std::string::npos)
+			break;
+		if (s[pos + 1]=='\'') 
+			s.replace(pos,2,"\'");
+		else if (s[pos + 1]=='\"') 
+			s.replace(pos,2,"\"");
+		else if (s[pos + 1]=='n') 
+			s.replace(pos,2,"\n");
+		else if (s[pos + 1]=='t') 
+			s.replace(pos,2,"\t");
+		else
+			throw syntaxError("unrecognized character: \\" + s[pos + 1]);
+		++pos;
+	}
+
+	value = s;
+}
+
 std::string BoolObj::ExternalRep()
 {
 	if ( value==true )
@@ -51,33 +91,48 @@ std::string RealObj::ExternalRep()
 
 std::string StringObj::ExternalRep()
 {
-	int pos;
+	int pos = 0;
 	std::string s(value);
 	while (1)
 	{
-		pos = s.find('\\');
+		pos = s.find('\\', pos);
 		if (pos == std::string::npos)
 			break;
 		s.replace(pos,1,"\\\\");
+		pos += 2;
 	}
 
+	pos = 0;
 	while (1)
 	{
-		pos = s.find('\"');
+		pos = s.find('\"', pos);
 		if (pos == std::string::npos)
 			break;
 		s.replace(pos,1,"\\\"");
+		pos +=2;
 	}
 
+	pos = 0;
 	while (1)
 	{
 		pos = s.find('\n');
 		if (pos == std::string::npos)
 			break;
 		s.replace(pos,1,"\\n");
+		pos += 2;
 	}
 
-	return s;
+	pos = 0;
+	while (1)
+	{
+		pos = s.find('\t');
+		if (pos == std::string::npos)
+			break;
+		s.replace(pos,1,"\\t");
+		pos += 2;
+	}
+
+	return "\"" + s + "\"";
 }
 
 std::string PairObj::ExternalRep()
@@ -87,9 +142,7 @@ std::string PairObj::ExternalRep()
 
 std::string SymbolObj::ExternalRep()
 {
-	if (value[0]=='\'')
-		return value.substr(1);
-	//else if (value[0]=='`')
+	return value;
 }
 
 bool operator==(const PairObj &a, const PairObj &b)

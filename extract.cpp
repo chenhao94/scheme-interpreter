@@ -27,7 +27,7 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 		quotation:
 		sentence.push_back(cache[pos++]);
 		
-		if (pos>=cacheSize-1 || cache[pos]=='\'' || cache[pos]=='`' || cache[pos]==',' || cache[pos]=='@' || cache[pos]==')')
+		if (pos>=cacheSize || cache[pos]=='\'' || cache[pos]=='`' || cache[pos]==',' || cache[pos]=='@' || cache[pos]==')')
 			throw syntaxError("Illegal use of quotation");
 		
 		if (cache[pos]=='\"')
@@ -56,7 +56,7 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 		++pareLevel;
 		sentence.push_back(cache[pos++]);
 
-		while (pos<cacheSize-1)
+		while (pos<cacheSize)
 		{
 			if (quoteFlag==true)
 			{
@@ -99,7 +99,7 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 			}
 		}
 
-		if (pos>cacheSize-1 || pareLevel!=0 || quoteFlag==true)
+		if (pos>cacheSize || pareLevel!=0 || quoteFlag==true)
 		{
 			cacheEndFlag = true;
 			sentence.clear();
@@ -119,7 +119,7 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 		sentence.push_back(cache[pos++]);
 		quoteFlag = true;
 
-		while (pos<cacheSize-1)
+		while (pos<cacheSize)
 		{
 			if (cache[pos]=='\"')
 			{
@@ -138,7 +138,7 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 			}
 		}
 
-		if (pos>cacheSize-1 || quoteFlag==true)
+		if (pos>cacheSize || quoteFlag==true)
 		{
 			cacheEndFlag = true;
 			sentence.clear();
@@ -154,7 +154,7 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 	else
 	{
 		commonplace:
-		while (pos<cacheSize-1)
+		while (pos<cacheSize)
 		{
 			if (cache[pos]=='(' || cache[pos]==')' || cache[pos]=='\'' || cache[pos]=='`' || cache[pos]=='\"' || cache[pos]==',' || isspace(cache[pos]))
 				break;

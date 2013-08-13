@@ -73,9 +73,6 @@ int main()
 		if (s[s.size()-1]=='\n')
 			s.pop_back();
 
-		if (tree!=NULL)
-			tree -> ~ParseTree();
-
 		depth = 0;
 
 		try

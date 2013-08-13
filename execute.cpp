@@ -11,9 +11,11 @@ builtInSet builtInProcedure({"+","-","*","/","<",">","<=",">=","gcd","max","min"
 
 Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 {
+	if (root == NULL)
+		return NULL;
+
 	std::string token = root->getToken();
 	Obj_ptr obj;
-
 	bool numberFlag = true, rationalFlag = false, realFlag = false, idenFlag = true;
 
 	checkToken(token, numberFlag, rationalFlag, realFlag, idenFlag);
@@ -75,26 +77,41 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 	//----string-------
 	else if (token[0]=='\"')
 	{
-		obj = Obj_ptr( new StringObj(token.substr(1, std::string::npos-1)) );
+		obj = Obj_ptr( new StringObj(token.substr(1, token.size()-2)) );
 		return obj;
 	}
 
 	//----symbol-------
 	else if (token[0]=='\'')
 	{
-		//W.T.F.
+		ParseTree_ptr context = root->getSon();
+
+		if (token=="\'()") // list
+		{
+			obj = makeList(context);
+			return obj;
+		}
+		else	//	symbol
+		{
+			obj = Obj_ptr( new SymbolObj( context->getToken() ) );
+			return obj;
+		}
 	}
 
 	//----syntax&procedure----
 	else if (token=="()")
 	{
 		ParseTree_ptr name = root->getSon();
+
+		if (name == NULL)
+			throw syntaxError("missing expression");
+
 		std::string iden = name->getToken();
 
 		//--------syntax------------
 		if (builtInSyntax.find(iden) != builtInSyntax.end())
 		{
-			return evaluateSyntax(iden, name, env);
+			return evaluateSyntax(iden, name->getBrother(), env);
 		}
 		
 		//--------procedure---------
@@ -221,5 +238,21 @@ void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, 
 	}
 
 	return;
+}
+
+Obj_ptr makeList(const ParseTree_ptr & tree)
+{
+	Obj_ptr obj;
+
+	if (tree==NULL)
+	{
+		obj = Obj_ptr( new PairObj(nullptr, nullptr) );
+		return obj;
+	}
+
+	Obj_ptr o1( new SymbolObj(tree->getToken()) );
+
+	obj = Obj_ptr( new PairObj(o1, makeList(tree->getBrother())) );
+	return obj;
 }
 

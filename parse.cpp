@@ -10,10 +10,8 @@
 
 ParseTree::~ParseTree()
 {
-	if ( son!=NULL )
-		son->~ParseTree();
-	if ( brother!=NULL )
-		brother->~ParseTree();
+	son = nullptr;
+	brother = nullptr;
 }
 
 ParseTree_ptr Parsing(std::string code) // code should be refined first
@@ -68,7 +66,7 @@ ParseTree_ptr Parsing(std::string code) // code should be refined first
 				newName = ParseTree_ptr(new ParseTree(name));
 
 				if (lastName==NULL)
-					quote = ParseTree_ptr(new ParseTree("\'", newName));
+					quote = ParseTree_ptr(new ParseTree("\'()", newName));
 				else
 					lastName->brother = newName;
 

@@ -20,4 +20,6 @@ void checkToken(const std::string &, bool &, bool &, bool &, bool &);
 
 Obj_ptr findIden(env_ptr env, const std::string&);
 
+Obj_ptr makeList(const ParseTree_ptr &);
+
 #endif
