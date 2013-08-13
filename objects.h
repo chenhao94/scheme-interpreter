@@ -204,6 +204,12 @@ class NumberObj: public Object
 
 		virtual std::string ExternalRep()=0;
 
+		virtual void getInt(Number_ptr &, IntegerObj *&)=0;
+
+		virtual void getRational(Number_ptr &, RationalObj *&)=0;
+
+		virtual void getReal(Number_ptr &, RealObj *&)=0;
+
 		virtual ~NumberObj() {}
 
 };
@@ -226,6 +232,12 @@ class IntegerObj: public NumberObj
 
 		std::string ExternalRep();
 
+		void getInt(Number_ptr & ptr, IntegerObj *& obj);
+
+		void getRational(Number_ptr & ptr, RationalObj *& obj);
+
+		void getReal(Number_ptr & ptr, RealObj *& obj);
+
 		friend RationalObj operator/ (const IntegerObj &, const IntegerObj &);
 		
 		friend IntegerObj operator% (const IntegerObj &, const IntegerObj &);
@@ -240,21 +252,25 @@ class RationalObj: public NumberObj
 
 	public:
 
-		RationalObj(bigRational i) : NumberObj(Rational), value(i) {}
+		RationalObj(bigRational i) : NumberObj(Rational), value(i) { value.canonicalize(); }
 
-		RationalObj(bigInteger a, bigInteger b) : NumberObj(Rational), value(a, b) {}
+		RationalObj(bigInteger a, bigInteger b) : NumberObj(Rational), value(a, b) { value.canonicalize(); }
 
-		RationalObj(IntegerObj a, IntegerObj b) : NumberObj(Rational), value(a.getValue(), b.getValue()) {}
+		RationalObj(IntegerObj a, IntegerObj b) : NumberObj(Rational), value(a.getValue(), b.getValue()) { value.canonicalize(); }
 
 		virtual ~RationalObj() {}
 
 		RationalObj(const RationalObj &obj) : NumberObj(Rational), value(obj.getValue()) {}
 
-		RationalObj(const IntegerObj &obj) : NumberObj(Rational), value(obj.getValue()) {}
-
 		bigRational getValue() const { return value; }
 
 		std::string ExternalRep();
+
+		void getInt(Number_ptr & ptr, IntegerObj *& obj);
+
+		void getRational(Number_ptr & ptr, RationalObj *& obj);
+
+		void getReal(Number_ptr & ptr, RealObj *& obj);
 
 };
 
@@ -272,11 +288,17 @@ class RealObj: public NumberObj
 
 		RealObj(const RealObj &obj) : NumberObj(Real), value(obj.getValue()) {}
 
-		RealObj(const RationalObj &obj) : NumberObj(Real), value(obj.getValue()) {}
+		//RealObj(const RationalObj &obj) : NumberObj(Real), value(obj.getValue()) {}
 
 		bigReal getValue() const { return value; }
 
 		std::string ExternalRep();
+
+		void getInt(Number_ptr & ptr, IntegerObj *& obj);
+
+		void getRational(Number_ptr & ptr, RationalObj *& obj);
+
+		void getReal(Number_ptr & ptr, RealObj *& obj);
 
 };
 
@@ -388,7 +410,7 @@ class Parameters
 
 		Para_ptr next;
 
-		Parameters(const Obj_ptr & o): obj(o), next(NULL) {}
+		Parameters(const Obj_ptr & o): obj(o), next(nullptr) {}
 };
 
 #endif

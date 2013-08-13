@@ -8,24 +8,62 @@
 #include "objects.h"
 #include <string>
 #include <sstream>
+#include <cassert>
 
-#include <iostream>//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!!!!!!!!!!!!!!!!!!!!!!!!
-/*
-RealObj operator+ (const RealObj &a, const RealObj &b)
+#include <iostream>
+using namespace std;
+
+void IntegerObj::getInt(Number_ptr & ptr, IntegerObj *& obj)
 {
-	using namespace std;			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	cout << "debugging!!" <<endl;
-	bigReal aa = a.getValue();
-	cout << aa << endl;
-	cout << b.getValue() << endl;
-	cout << a.getValue() + b.getValue() << endl;
-	RealObj ans(a.getValue() + b.getValue());
-	return ans;
+	ptr = nullptr;
+	obj = this;
 }
-*/
+
+void IntegerObj::getRational(Number_ptr & ptr, RationalObj *& obj)
+{
+	ptr = Rational_ptr( obj = new RationalObj(value) );
+}
+
+void IntegerObj::getReal(Number_ptr & ptr, RealObj *& obj)
+{
+	ptr = Real_ptr( obj = new RealObj(value) );
+}
+
+void RationalObj::getInt(Number_ptr & ptr, IntegerObj *& obj)
+{
+	assert(false);
+}
+
+void RationalObj::getRational(Number_ptr & ptr, RationalObj *& obj)
+{
+	ptr = nullptr; 
+	obj = this;
+}
+
+void RationalObj::getReal(Number_ptr & ptr, RealObj *& obj)
+{
+	ptr = Real_ptr( obj = new RealObj(value) );
+}
+
+void RealObj::getInt(Number_ptr & ptr, IntegerObj *& obj)
+{
+	assert(false);
+}
+
+void RealObj::getRational(Number_ptr & ptr, RationalObj *& obj)
+{
+	assert(false);
+}
+
+void RealObj::getReal(Number_ptr & ptr, RealObj *& obj)
+{
+	ptr = nullptr;
+	obj = this;
+}
 
 StringObj::StringObj(std::string s): Object(String)
 {
+	cout << s << endl;
 	int pos = 0;
 
 	while (1)
@@ -33,7 +71,9 @@ StringObj::StringObj(std::string s): Object(String)
 		pos = s.find('\\', pos);
 		if (pos == std::string::npos)
 			break;
-		if (s[pos + 1]=='\'') 
+		if (s[pos + 1]=='\\') 
+			s.replace(pos,2,"\\");
+		else if (s[pos + 1]=='\'') 
 			s.replace(pos,2,"\'");
 		else if (s[pos + 1]=='\"') 
 			s.replace(pos,2,"\"");
@@ -42,7 +82,7 @@ StringObj::StringObj(std::string s): Object(String)
 		else if (s[pos + 1]=='t') 
 			s.replace(pos,2,"\t");
 		else
-			throw syntaxError("unrecognized character: \\" + s[pos + 1]);
+			throw syntaxError(std::string("unrecognized character: \\") + std::string(1, s[pos + 1]));
 		++pos;
 	}
 
@@ -195,10 +235,26 @@ bool equal (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	{
 		NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
 		if (aT == Real || bT == Real)
-			return operator==( *static_cast<RealObj*>(a), *static_cast<RealObj*>(b) );
+		{
+			RealObj *pa, *pb;
+			Number_ptr paPtr, pbPtr;
+			static_cast<NumberObj*>(a)->getReal(paPtr, pa);
+			static_cast<NumberObj*>(b)->getReal(pbPtr, pb);
+			return (*pa == *pb );
+		}
 		if (aT == Rational || bT == Rational)
-			return operator==( *static_cast<RationalObj*>(a), *static_cast<RationalObj*>(b) );
-		return operator==( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
+		{
+			RationalObj *pa, *pb;
+			Number_ptr paPtr, pbPtr;
+			static_cast<NumberObj*>(a)->getRational(paPtr, pa);
+			static_cast<NumberObj*>(b)->getRational(pbPtr, pb);
+			return ( *pa == *pb );
+		}
+		IntegerObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		static_cast<NumberObj*>(a)->getInt(paPtr, pa);
+		static_cast<NumberObj*>(b)->getInt(pbPtr, pb);
+		return ( *pa == *pb );
 
 	}
 	if (a->Type == String)
@@ -218,162 +274,227 @@ bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 
 bool lessThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type != Number || b->Type != Number)
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type!=Number || bb->Type!=Number)
 		throw syntaxError("Unexpected type");
 
-	NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
+	NumberObj *a(static_cast<NumberObj*>(aa)), *b(static_cast<NumberObj*>(bb));
+
+	NumberType aT( a->numType ), bT( b->numType );
 	if (aT == Real || bT == Real)
-		return operator<( *static_cast<RealObj*>(a), *static_cast<RealObj*>(b) );
+	{
+		RealObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getReal(paPtr, pa);
+		b->getReal(pbPtr, pb);
+		return (*pa < *pb );
+	}
 	if (aT == Rational || bT == Rational)
-		return operator<( *static_cast<RationalObj*>(a), *static_cast<RationalObj*>(b) );
-	return operator<( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
+	{
+		RationalObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getRational(paPtr, pa);
+		b->getRational(pbPtr, pb);
+		return ( *pa < *pb );
+	}
+	IntegerObj *pa, *pb;
+	Number_ptr paPtr, pbPtr;
+	a->getInt(paPtr, pa);
+	b->getInt(pbPtr, pb);
+	return ( *pa < *pb );
 }
 
 bool greaterThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type!=Number || b->Type!=Number)
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type!=Number || bb->Type!=Number)
 		throw syntaxError("Unexpected type");
 
-	NumberType aT( static_cast<NumberObj*>(a)->numType ), bT( static_cast<NumberObj*>(b)->numType );
+	NumberObj *a(static_cast<NumberObj*>(aa)), *b(static_cast<NumberObj*>(bb));
+
+	NumberType aT( a->numType ), bT( b->numType );
 	if (aT == Real || bT == Real)
-		return operator>( *static_cast<RealObj*>(a), *static_cast<RealObj*>(b) );
+	{
+		RealObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getReal(paPtr, pa);
+		b->getReal(pbPtr, pb);
+		return (*pa > *pb );
+	}
 	if (aT == Rational || bT == Rational)
-		return operator>( *static_cast<RationalObj*>(a), *static_cast<RationalObj*>(b) );
-	return operator>( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
+	{
+		RationalObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getRational(paPtr, pa);
+		b->getRational(pbPtr, pb);
+		return ( *pa > *pb );
+	}
+	IntegerObj *pa, *pb;
+	Number_ptr paPtr, pbPtr;
+	a->getInt(paPtr, pa);
+	b->getInt(pbPtr, pb);
+	return ( *pa > *pb );
 }
 
 bool lessEq (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type != Number || b->Type != Number)
-		throw syntaxError("Unexpected type");
-
-	NumberType aT( static_cast<NumberObj*>(a)->numType ), bT( static_cast<NumberObj*>(b)->numType );
-	if (aT == Real || bT == Real)
-		return operator<=( *static_cast<RealObj*>(a), *static_cast<RealObj*>(b) );
-	if (aT == Rational || bT == Rational)
-		return operator<=( *static_cast<RationalObj*>(a), *static_cast<RationalObj*>(b) );
-	return operator<=( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
+	return !greaterThan(aPtr, bPtr);
 }
 
 bool greaterEq (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type != Number || b->Type != Number)
-		throw syntaxError("Unexpected type");
-
-	NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
-	if (aT == Real || bT == Real)
-		return operator>=( *static_cast<RealObj*>(a), *static_cast<RealObj*>(b) );
-	if (aT == Rational || bT == Rational)
-		return operator>=( *static_cast<RationalObj*>(a), *static_cast<RationalObj*>(b) );
-	return operator>=( *static_cast<IntegerObj*>(a), *static_cast<IntegerObj*>(b) );
+	return !lessThan(aPtr, bPtr);
 }
 
 Obj_ptr Add (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
+	Object *aa = aPtr.get(), *bb = bPtr.get();
 
-	if (a->Type == String && b->Type == String)
+	if (aa->Type == String && bb->Type == String)
 	{
-		String_ptr ptr( new StringObj( *static_cast<StringObj*>(a) + *static_cast<StringObj*>(b) ) );
+		String_ptr ptr( new StringObj( *static_cast<StringObj*>(aa) + *static_cast<StringObj*>(bb) ) );
 		return ptr;
 	}
 
-	if (a->Type != Number || b->Type != Number)
+	if (aa->Type != Number || bb->Type != Number)
 		throw syntaxError("Unexpected type");
 
-	NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
+	NumberObj *a(static_cast<NumberObj*>(aa)), *b(static_cast<NumberObj*>(bb));
+
+	NumberType aT( a->numType ), bT( b->numType );
 	if (aT == Real || bT == Real)
 	{
-		Real_ptr ptr( new RealObj( *static_cast<RealObj*>(a) + *static_cast<RealObj*>(b) ) );
-		return ptr;
+		RealObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getReal(paPtr, pa);
+		b->getReal(pbPtr, pb);
+		return Obj_ptr(new RealObj(*pa + *pb ));
 	}
 	if (aT == Rational || bT == Rational)
 	{
-		Rational_ptr ptr( new RationalObj( *static_cast<RationalObj*>(a) + *static_cast<RationalObj*>(b) ) );
-		return ptr;
+		RationalObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getRational(paPtr, pa);
+		b->getRational(pbPtr, pb);
+		return Obj_ptr(new RationalObj( *pa + *pb ));
 	}
-	Int_ptr ptr( new IntegerObj( *static_cast<IntegerObj*>(a) + *static_cast<IntegerObj*>(b) ) );
-	return ptr;
+	IntegerObj *pa, *pb;
+	Number_ptr paPtr, pbPtr;
+	a->getInt(paPtr, pa);
+	b->getInt(pbPtr, pb);
+	return Obj_ptr(new IntegerObj( *pa + *pb ));
 }
 
 Obj_ptr Subtract (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type != Number || b->Type != Number)
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
 		throw syntaxError("Unexpected type");
 
-	NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
+	NumberObj *a(static_cast<NumberObj*>(aa)), *b(static_cast<NumberObj*>(bb));
+
+	NumberType aT( a->numType ), bT( b->numType );
 	if (aT == Real || bT == Real)
 	{
-		Real_ptr ptr( new RealObj( *static_cast<RealObj*>(a) - *static_cast<RealObj*>(b) ) );
-		return ptr;
+		RealObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getReal(paPtr, pa);
+		b->getReal(pbPtr, pb);
+		return Obj_ptr(new RealObj( *pa - *pb ));
 	}
 	if (aT == Rational || bT == Rational)
 	{
-		Rational_ptr ptr( new RationalObj( *static_cast<RationalObj*>(a) - *static_cast<RationalObj*>(b) ) );
-		return ptr;
+		RationalObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getRational(paPtr, pa);
+		b->getRational(pbPtr, pb);
+		return Obj_ptr(new RationalObj( *pa - *pb ));
 	}
-	Int_ptr ptr( new IntegerObj( *static_cast<IntegerObj*>(a) - *static_cast<IntegerObj*>(b) ) );
-	return ptr;
+	IntegerObj *pa, *pb;
+	Number_ptr paPtr, pbPtr;
+	a->getInt(paPtr, pa);
+	b->getInt(pbPtr, pb);
+	return Obj_ptr(new IntegerObj( *pa - *pb ));
 }
 
 Obj_ptr Multiply (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type != Number || b->Type != Number)
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
 		throw syntaxError("Unexpected type");
 
-	NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
+	NumberObj *a(static_cast<NumberObj*>(aa)), *b(static_cast<NumberObj*>(bb));
+
+	NumberType aT( a->numType ), bT( b->numType );
 	if (aT == Real || bT == Real)
 	{
-		Real_ptr ptr( new RealObj( *static_cast<RealObj*>(a) * *static_cast<RealObj*>(b) ) );
-		return ptr;
+		RealObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getReal(paPtr, pa);
+		b->getReal(pbPtr, pb);
+		return Obj_ptr(new RealObj( *pa * *pb ));
 	}
 	if (aT == Rational || bT == Rational)
 	{
-		Rational_ptr ptr( new RationalObj( *static_cast<RationalObj*>(a) * *static_cast<RationalObj*>(b) ) );
-		return ptr;
+		RationalObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getRational(paPtr, pa);
+		b->getRational(pbPtr, pb);
+		return Obj_ptr(new RationalObj( *pa * *pb ));
 	}
-	Int_ptr ptr( new IntegerObj( *static_cast<IntegerObj*>(a) * *static_cast<IntegerObj*>(b) ) );
-	return ptr;
+	IntegerObj *pa, *pb;
+	Number_ptr paPtr, pbPtr;
+	a->getInt(paPtr, pa);
+	b->getInt(pbPtr, pb);
+	return Obj_ptr(new IntegerObj( *pa * *pb ));
 }
 
 Obj_ptr Divide (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type != Number || b->Type != Number)
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
 		throw syntaxError("Unexpected type");
 
-	NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
+	NumberObj *a(static_cast<NumberObj*>(aa)), *b(static_cast<NumberObj*>(bb));
+
+	NumberType aT( a->numType ), bT( b->numType );
 	if (aT == Real || bT == Real)
 	{
-		Real_ptr ptr( new RealObj( *static_cast<RealObj*>(a) / *static_cast<RealObj*>(b) ) );
-		return ptr;
+		RealObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getReal(paPtr, pa);
+		b->getReal(pbPtr, pb);
+		return Obj_ptr(new RealObj( *pa / *pb ));
 	}
 	if (aT == Rational || bT == Rational)
 	{
-		Rational_ptr ptr( new RationalObj( *static_cast<RationalObj*>(a) / *static_cast<RationalObj*>(b) ) );
-		return ptr;
+		RationalObj *pa, *pb;
+		Number_ptr paPtr, pbPtr;
+		a->getRational(paPtr, pa);
+		b->getRational(pbPtr, pb);
+		return Obj_ptr(new RationalObj( *pa / *pb ));
 	}
-	Rational_ptr ptr( new RationalObj( *static_cast<IntegerObj*>(a) / *static_cast<IntegerObj*>(b) ) );
-	return ptr;
+	IntegerObj *pa, *pb;
+	Number_ptr paPtr, pbPtr;
+	a->getInt(paPtr, pa);
+	b->getInt(pbPtr, pb);
+	return Obj_ptr(new RationalObj( *pa / *pb ));
 }
 
-Obj_ptr Module (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+Obj_ptr Modulo (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
-	Object *a = aPtr.get(), *b = bPtr.get();
-	if (a->Type != Number || b->Type != Number)
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
 		throw syntaxError("Unexpected type");
 
-	NumberType aT(static_cast<NumberObj*>(a)->numType), bT(static_cast<NumberObj*>(b)->numType);
+	NumberType aT( static_cast<NumberObj*>(aa)->numType ),
+			   bT( static_cast<NumberObj*>(bb)->numType );
 	if (aT != Integer || bT != Integer)
 		throw syntaxError("Unexpected type");
 
-	Int_ptr ptr( new IntegerObj( *static_cast<IntegerObj*>(a) % *static_cast<IntegerObj*>(b) ) );
+	IntegerObj *a(static_cast<IntegerObj*>(aa)), *b(static_cast<IntegerObj*>(bb));
+
+	Int_ptr ptr( new IntegerObj( *a % *b ) );
 	return ptr;
 }
 

@@ -1,5 +1,5 @@
 main : 	compilingError.h useGMP.h objects.o environments.o parse.o 	\
-		execute.o builtIn.o userDefined.o extract.o main.o
+		execute.o builtIn.o userDefined.o extract.o main.o parseTreePrinter
 	g++ main.o objects.o environments.o parse.o execute.o builtIn.o \
 		userDefined.o extract.o -lm -std=c++11 -lgmp -lgmpxx -o main -g
 

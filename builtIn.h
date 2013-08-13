@@ -17,4 +17,8 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &, const Para_ptr&, env_ptr &
 
 Obj_ptr evaluateSyntax(const std::string &, const ParseTree_ptr &, env_ptr &);
 
+Obj_ptr evaluateCondClause(const ParseTree_ptr &, env_ptr &);
+
+Obj_ptr evaluateCaseClause(const Obj_ptr &, const ParseTree_ptr &, env_ptr &);
+
 #endif

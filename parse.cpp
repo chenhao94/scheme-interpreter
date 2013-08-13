@@ -74,7 +74,7 @@ ParseTree_ptr Parsing(std::string code) // code should be refined first
 			}
 
 			if (lastName==NULL)
-				quote = ParseTree_ptr(new ParseTree("\'"));
+				quote = ParseTree_ptr(new ParseTree("\'()"));
 
 			return quote;
 		}

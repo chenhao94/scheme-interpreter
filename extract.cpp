@@ -90,6 +90,8 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 				else if (cache[pos]==')')
 				{
 					--pareLevel;
+					if (pareLevel < 0)
+						throw syntaxError("unexpected: \')\'");
 					sentence.push_back(cache[pos++]);
 					if (pareLevel==0)
 						break;
@@ -156,7 +158,10 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 		commonplace:
 		while (pos<cacheSize)
 		{
-			if (cache[pos]=='(' || cache[pos]==')' || cache[pos]=='\'' || cache[pos]=='`' || cache[pos]=='\"' || cache[pos]==',' || isspace(cache[pos]))
+			if (cache[pos]==')')
+				throw syntaxError("unexpected: \')\'");
+				
+			if (cache[pos]=='(' || cache[pos]=='\'' || cache[pos]=='`' || cache[pos]=='\"' || cache[pos]==',' || isspace(cache[pos]))
 				break;
 			else
 				sentence.push_back(cache[pos++]);
