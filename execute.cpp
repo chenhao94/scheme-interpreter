@@ -11,8 +11,8 @@ builtInSet builtInProcedure({"+","-","*","/","<",">","<=",">=","gcd","max","min"
 
 Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 {
-	if (root == NULL)
-		return NULL;
+	if (root == nullptr)
+		return nullptr;
 
 	std::string token = root->getToken();
 	Obj_ptr obj;
@@ -39,7 +39,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 	else if (idenFlag)
 	{
 		obj = findIden(env, token);
-		if (obj.get() == NULL)
+		if (obj.get() == nullptr)
 			throw syntaxError("Undefined identifier: " + token);
 		return obj;
 	}
@@ -103,7 +103,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 	{
 		ParseTree_ptr name = root->getSon();
 
-		if (name == NULL)
+		if (name == nullptr)
 			throw syntaxError("missing expression");
 
 		std::string iden = name->getToken();
@@ -118,7 +118,16 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 
 		Obj_ptr obj = findIden(env, iden);
 
-		if (obj==NULL)
+			//--------procedure object----
+			if (iden == "()")
+			{
+				obj = evaluate(name, env);
+				if (obj->Type != Procedure)
+					throw syntaxError("not a procedure");
+			}
+
+
+		if (obj==nullptr)
 		{
 			if (builtInProcedure.find(iden) == builtInProcedure.end())
 				throw syntaxError("Undefined identifier: " + iden);
@@ -127,11 +136,11 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 			throw syntaxError("\'" + iden + "\' is not a procedure");
 
 		ParseTree_ptr para = name->getBrother();
-		Para_ptr head=NULL, tail=NULL;
+		Para_ptr head=nullptr, tail=nullptr;
 
-		while (para!=NULL)
+		while (para!=nullptr)
 		{
-			if (head==NULL)
+			if (head==nullptr)
 			{
 				head = Para_ptr( new Parameters(evaluate(para, env)) );
 				tail = head;
@@ -147,7 +156,6 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 
 		if (obj)	//define by user
 		{
-			// !!!!!!!ENVIRONMENT!!!!!!!!
 			return evaluateUserDefined(obj, head, env);
 		}
 		else		// built-in
@@ -168,14 +176,14 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 Obj_ptr findIden(env_ptr env, const std::string &name)
 {
 	Obj_ptr obj;
-	while (env!=NULL)
+	while (env!=nullptr)
 	{
 		obj = env->FindObj(name);
-		if (obj!=NULL)
+		if (obj!=nullptr)
 			return obj;
 		env = env->next;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, bool &realFlag, bool &idenFlag)
@@ -244,7 +252,7 @@ Obj_ptr makeList(const ParseTree_ptr & tree)
 {
 	Obj_ptr obj;
 
-	if (tree==NULL)
+	if (tree==nullptr)
 	{
 		obj = Obj_ptr( new PairObj(nullptr, nullptr) );
 		return obj;

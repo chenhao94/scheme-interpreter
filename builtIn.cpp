@@ -252,7 +252,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	{
 		Para_ptr para1 = para, para2;
 		
-		if (para1 == nullptr || para1->next == NULL || para1->next->next != NULL)
+		if (para1 == nullptr || para1->next == nullptr || para1->next->next != nullptr)
 			throw syntaxError("mcons: expect 2 arguments");
 
 		para2 = para->next;
@@ -261,7 +261,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	}
 	else if (name=="car")
 	{
-		if (para == nullptr || para->next != NULL)
+		if (para == nullptr || para->next != nullptr)
 			throw syntaxError("mcar: expect 1 argument");
 		
 		Object* obj = para->obj.get();
@@ -272,7 +272,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	}
 	else if (name=="cdr")
 	{
-		if (para == nullptr || para->next != NULL)
+		if (para == nullptr || para->next != nullptr)
 			throw syntaxError("mcar: expect 1 argument");
 		
 		Object *obj = para->obj.get();
@@ -285,7 +285,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	{
 		Para_ptr para1 = para, para2;
 		
-		if (para1 == nullptr || para1->next == NULL || para1->next->next != NULL)
+		if (para1 == nullptr || para1->next == nullptr || para1->next->next != nullptr)
 			throw syntaxError("eq? or eqv?: expect 2 arguments");
 
 		para2 = para->next;
@@ -305,7 +305,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	{
 		Para_ptr para1 = para, para2;
 		
-		if (para1 == nullptr || para1->next == NULL || para1->next->next != NULL)
+		if (para1 == nullptr || para1->next == nullptr || para1->next->next != nullptr)
 			throw syntaxError("eq? or eqv?: expect 2 arguments");
 
 		para2 = para->next;
@@ -337,7 +337,7 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 		if (consequence == nullptr)
 			goto badIfSyntax;
 		alternate = consequence->getBrother();
-		if (alternate != nullptr && alternate->getBrother() != NULL)
+		if (alternate != nullptr && alternate->getBrother() != nullptr)
 			goto badIfSyntax;
 
 		if (false)
@@ -391,22 +391,84 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 	}
 	else if (name=="define")
 	{
-		std::string iden = tree->getToken();
-		if (tree->getSon() != nullptr || tree->getBrother() == NULL || tree->getBrother()->getBrother() != NULL)
-			throw syntaxError("define: bad syntax(missing expression or multiple expression)");
-
+		std::string iden = tree->getToken(), varName;
 		bool idenFlag, tmp1, tmp2, tmp3;
-		checkToken(iden, tmp1, tmp2, tmp3, idenFlag);
-		if (!idenFlag)
-			throw syntaxError("define: bad identifier: " + iden);
 
-		env->DefineObj( iden, evaluate(tree->getBrother(), env) );
+		if (iden == "()")
+		{
+			if (tree->getBrother() == nullptr)
+				throw syntaxError("define: bad syntax(missing expression)");
+
+			ParseTree_ptr vars = tree->getSon();
+			Arg_ptr now, last = nullptr, head = nullptr;
+			Procedure_ptr proc;
+			if (vars == nullptr)
+				throw syntaxError("define: bad syntax in: ()");
+
+			iden = vars->getToken();
+			checkToken(iden, tmp1, tmp2, tmp3, idenFlag);
+			if (!idenFlag)
+				throw syntaxError("define: bad identifier: " + iden);
+
+			vars = vars->getBrother();
+			while (vars)
+			{
+				varName = vars->getToken();
+				if (varName == ".")
+				{
+					vars = vars->getBrother();
+					if (vars == nullptr || vars->getBrother() != nullptr)
+						throw syntaxError("illegal use of \'.\'");
+					varName = vars->getToken();
+
+					checkToken(varName, tmp1, tmp2, tmp3, idenFlag);
+					if (!idenFlag)
+						throw syntaxError("define: bad identifier: " + iden);
+
+					now = Arg_ptr( new Arguments(varName, true) );
+					if (last != nullptr)
+						last->next = now;
+					else
+						head = now;
+					last = now;
+				}
+				else
+				{
+					checkToken(varName, tmp1, tmp2, tmp3, idenFlag);
+					if (!idenFlag)
+						throw syntaxError("define: bad identifier: " + iden);
+
+					now = Arg_ptr( new Arguments(varName, false) );
+					if (last != nullptr)
+						last->next = now;
+					else
+						head = now;
+					last = now;
+				}
+
+				vars = vars->getBrother();
+			}
+
+			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother()) );
+			env->DefineObj(iden, proc);
+		}
+		else
+		{
+			if (tree->getSon() != nullptr || tree->getBrother() == nullptr || tree->getBrother()->getBrother() != nullptr)
+				throw syntaxError("define: bad syntax(missing expression or multiple expression)");
+
+			checkToken(iden, tmp1, tmp2, tmp3, idenFlag);
+			if (!idenFlag)
+				throw syntaxError("define: bad identifier: " + iden);
+
+			env->DefineObj( iden, evaluate(tree->getBrother(), env) );
+		}
 		return nullptr;
 	}
 	else if (name=="set!")
 	{
 		std::string iden = tree->getToken();
-		if (tree->getSon() != nullptr || tree->getBrother() == NULL || tree->getBrother()->getBrother() != NULL)
+		if (tree->getSon() != nullptr || tree->getBrother() == nullptr || tree->getBrother()->getBrother() != nullptr)
 			throw syntaxError("set!: bad syntax(missing expression or multiple expression)");
 
 		bool idenFlag, tmp1, tmp2, tmp3;
@@ -429,7 +491,68 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 	}
 	else if (name=="lambda")
 	{
-		//W.T.F.
+		std::string iden = tree->getToken(), varName;
+		bool idenFlag, tmp1, tmp2, tmp3;
+		ParseTree_ptr vars;
+		Arg_ptr now, last = nullptr, head = nullptr;
+		Procedure_ptr proc;
+
+		if (iden == "()")
+		{
+			vars = tree->getSon();
+			while (vars)
+			{
+				varName = vars->getToken();
+				if (varName == ".")
+				{
+					vars = vars->getBrother();
+					if (vars == nullptr || vars->getBrother() != nullptr)
+						throw syntaxError("illegal use of \'.\'");
+					varName = vars->getToken();
+
+					checkToken(varName, tmp1, tmp2, tmp3, idenFlag);
+					if (!idenFlag)
+						throw syntaxError("define: bad identifier: " + iden);
+
+					now = Arg_ptr( new Arguments(varName, true) );
+					if (last != nullptr)
+						last->next = now;
+					else
+						head = now;
+					last = now;
+				}
+				else
+				{
+					checkToken(varName, tmp1, tmp2, tmp3, idenFlag);
+					if (!idenFlag)
+						throw syntaxError("define: bad identifier: " + iden);
+
+					now = Arg_ptr( new Arguments(varName, false) );
+					if (last != nullptr)
+						last->next = now;
+					else
+						head = now;
+					last = now;
+				}
+
+				vars = vars->getBrother();
+			}
+
+			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother()) );
+		}
+		else
+		{
+			vars = tree;
+			varName = iden;
+			checkToken(varName, tmp1, tmp2, tmp3, idenFlag);
+			if (!idenFlag)
+				throw syntaxError("define: bad identifier: " + iden);
+
+			head = Arg_ptr( new Arguments(varName, true) );
+			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother()) );
+		}
+
+		return proc;
 	}
 	else if (name=="quote")
 	{

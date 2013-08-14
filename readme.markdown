@@ -17,6 +17,7 @@ I believe the users will not use the definition above. Redefining the built-in s
 The followings are available in the interpreter now.
 * if
 * define
+* lamdba
 
 ##Procedure
 The followings are available in the interpreter now.

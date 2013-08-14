@@ -13,5 +13,7 @@
 
 Obj_ptr evaluateUserDefined( const Obj_ptr & , const Para_ptr & , env_ptr & );
 
+Obj_ptr makeList(const Para_ptr &);
+
 #endif
 

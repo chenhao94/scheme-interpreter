@@ -383,17 +383,19 @@ class ProcedureObj: public Object
 
 		std::string ExternalRep() { return "#<procedure>"; }
 
+		const Arg_ptr & getArgHead() { return argHead; }
+
+		const ParseTree_ptr & getBody() { return body; }
+
 };
 
 class Arguments
 {
-	private:
+	public:
 
 		std::string name;
 
 		bool spaceDelimited;
-
-	public:
 
 		Arg_ptr next;
 

@@ -25,7 +25,7 @@ class Environment
 
 		env_ptr next;
 
-		Environment(const env_ptr &ptr=NULL) : next(ptr) {}
+		Environment(const env_ptr &ptr=nullptr) : next(ptr) {}
 
 		virtual ~Environment();
 

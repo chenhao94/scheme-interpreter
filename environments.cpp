@@ -6,10 +6,7 @@
 #include "environments.h"
 
 Environment::~Environment()
-{
-	if (next!=NULL)
-		next->~Environment();
-}
+{}
 
 void Environment::DefineObj(std::string name, Obj_ptr obj)
 {

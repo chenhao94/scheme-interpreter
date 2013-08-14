@@ -160,6 +160,12 @@ ParseTree_ptr Parsing(std::string code) // code should be refined first
 		ParseTree_ptr node( new ParseTree(code) );
 		return node;
 	}
+	else if (code == ".")
+	{
+		// ( x . y )
+		ParseTree_ptr node( new ParseTree(code) );
+		return node;
+	}
 	else // identifiers or numbers without redundant whitspaces
 	{
 		bool rationalFlag = false, realFlag = false, numbersFlag = true;
