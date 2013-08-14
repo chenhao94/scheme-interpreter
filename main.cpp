@@ -16,8 +16,12 @@ int main()
 	ParseTree_ptr tree = NULL;
 	env_ptr env(new Environment() );
 
+	cout << "Welcome to CH's Scheme Interpreter!!" << endl;
+
 	while (!cin.eof())
 	{
+		if (cache.size() == 0)
+			cout << "> ";
 		cin.getline( tmp, 200 );
 		cache.append(tmp);
 		cacheEndFlag = false;

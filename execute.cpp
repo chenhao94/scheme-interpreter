@@ -156,7 +156,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 
 		if (obj)	//define by user
 		{
-			return evaluateUserDefined(obj, head, env);
+			return evaluateUserDefined(obj, head);
 		}
 		else		// built-in
 		{

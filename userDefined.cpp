@@ -4,12 +4,12 @@
 
 #include "userDefined.h"
 
-Obj_ptr evaluateUserDefined( const Obj_ptr &func, const Para_ptr & para, env_ptr & env)
+Obj_ptr evaluateUserDefined( const Obj_ptr &func, const Para_ptr & para)
 {
 	if ( func->Type != Procedure )
 		throw syntaxError("not a procedure");
 
-	env_ptr newEnv( new Environment(env) );
+	env_ptr newEnv( new Environment(static_cast<ProcedureObj*>(func.get())->getEnv()) );
 
 	//-----check argument list------------
 	Para_ptr lastPara( para );

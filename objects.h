@@ -38,6 +38,7 @@ class ProcedureObj;
 class ParseTree;
 class Arguments;
 class Parameters;
+class Environment;
 
 typedef std::shared_ptr<Object> Obj_ptr;
 typedef std::shared_ptr<BoolObj> Bool_ptr;
@@ -53,6 +54,7 @@ typedef std::shared_ptr<ProcedureObj> Procedure_ptr;
 typedef std::shared_ptr<Arguments> Arg_ptr;
 typedef std::shared_ptr<Parameters> Para_ptr;
 typedef std::shared_ptr<ParseTree> ParseTree_ptr;
+typedef std::shared_ptr<Environment> env_ptr;
 
 bool equal (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
@@ -375,9 +377,11 @@ class ProcedureObj: public Object
 
 		ParseTree_ptr body;
 
+		env_ptr env;
+
 	public:
 
-		ProcedureObj(const Arg_ptr & h, const ParseTree_ptr & b):  Object(Procedure), argHead(h), body(b){}
+		ProcedureObj(const Arg_ptr & h, const ParseTree_ptr & b, env_ptr & _env):  Object(Procedure), argHead(h), body(b), env(_env){}
 
 		virtual ~ProcedureObj() {}
 
@@ -386,6 +390,8 @@ class ProcedureObj: public Object
 		const Arg_ptr & getArgHead() { return argHead; }
 
 		const ParseTree_ptr & getBody() { return body; }
+
+		env_ptr & getEnv() { return env; }
 
 };
 

@@ -449,7 +449,7 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 				vars = vars->getBrother();
 			}
 
-			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother()) );
+			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother(), env) );
 			env->DefineObj(iden, proc);
 		}
 		else
@@ -538,7 +538,7 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 				vars = vars->getBrother();
 			}
 
-			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother()) );
+			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother(), env) );
 		}
 		else
 		{
@@ -549,7 +549,7 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 				throw syntaxError("define: bad identifier: " + iden);
 
 			head = Arg_ptr( new Arguments(varName, true) );
-			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother()) );
+			proc = Procedure_ptr( new ProcedureObj(head, tree->getBrother(), env) );
 		}
 
 		return proc;

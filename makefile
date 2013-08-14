@@ -34,5 +34,5 @@ parseTreePrinter.o : parseTreePrinter.cpp parse.h
 	g++ parseTreePrinter.cpp -c -lgmp -lgmpxx -std=c++11
 	
 clear: 
-	rm *.o main parseTreePrinter
+	rm *.o *~ main parseTreePrinter
 
