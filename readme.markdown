@@ -15,7 +15,7 @@ I believe the users will not use the definition above. Redefining the built-in s
 
 ##Syntax
 The followings are available in the interpreter now.
-* if
+* if, cond, case
 * define
 * lamdba
 

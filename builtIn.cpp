@@ -607,7 +607,39 @@ Obj_ptr evaluateCondClause(const ParseTree_ptr & clause, env_ptr & env)
 
 Obj_ptr evaluateCaseClause(const Obj_ptr & key, const ParseTree_ptr & clause, env_ptr & env)
 {
-	//W.T.F.
+	ParseTree_ptr dat = clause->getSon();
+	Obj_ptr obj;
+
+	if (dat == nullptr)
+		throw syntaxError("missing expression");
+
+	ParseTree_ptr expression = dat->getBrother();
+
+	if (dat->getToken() == "else")
+		goto Execute;
+	if (dat->getToken() != "()")
+		throw syntaxError("case: bad syntax");
+
+	dat = dat->getSon();
+	while (dat)
+	{
+		if ( equal(key, evaluate(dat, env)) )
+			goto Execute;
+		dat = dat->getBrother();
+	}
+
+	if (false)
+	{
+		Execute:
+		obj = nullptr;
+		while (expression != nullptr)
+		{
+			obj = evaluate(expression, env);
+			expression = expression->getBrother();
+		}
+		return obj;
+	}
+	return nullptr;
 }
 
 
