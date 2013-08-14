@@ -566,7 +566,43 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 
 Obj_ptr evaluateCondClause(const ParseTree_ptr & clause, env_ptr & env)
 {
-	//W.T.F.
+	ParseTree_ptr test = clause->getSon();
+	Obj_ptr obj;
+
+	if (test == nullptr)
+		throw syntaxError("missing expression");
+
+	ParseTree_ptr expression = test->getBrother();
+
+	if (test->getToken() == "else")
+		goto Execute;
+
+	obj = evaluate(test, env);
+	if (!( obj->Type==Bool && static_cast<BoolObj*>(obj.get())->getValue() == false ))
+	{
+		if ( expression->getToken() == "=>" )  // ----- => -------
+		{
+			expression = expression->getBrother();
+			if ( expression == nullptr || expression->getBrother() != nullptr )
+				throw syntaxError("illegal use of: \'=>\'");
+
+			Obj_ptr func(evaluate(expression, env));
+			Para_ptr para( new Parameters(obj) );
+			return evaluateUserDefined(func, para, env);
+		}
+		else
+		{
+			Execute:
+			obj = nullptr;
+			while (expression != nullptr)
+			{
+				obj = evaluate(expression, env);
+				expression = expression->getBrother();
+			}
+			return obj;
+		}
+	}
+	return nullptr;
 }
 
 Obj_ptr evaluateCaseClause(const Obj_ptr & key, const ParseTree_ptr & clause, env_ptr & env)

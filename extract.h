@@ -9,5 +9,7 @@
 #include <string>
 void extract(std::string & sentence, std::string & cache, bool &);
 
+void eliminateComment(std::string &);
+
 #endif
 

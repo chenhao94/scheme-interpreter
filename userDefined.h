@@ -9,9 +9,10 @@
 #include "environments.h"
 #include "execute.h"
 #include "compilingError.h"
+#include "builtIn.h"
 #include <string>
 
-Obj_ptr evaluateUserDefined( const Obj_ptr & , const Para_ptr &);
+Obj_ptr evaluateUserDefined( const Obj_ptr & , const Para_ptr &, env_ptr &  env);
 
 Obj_ptr makeList(const Para_ptr &);
 

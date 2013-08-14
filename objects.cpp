@@ -10,9 +10,6 @@
 #include <sstream>
 #include <cassert>
 
-#include <iostream>
-using namespace std;
-
 void IntegerObj::getInt(Number_ptr & ptr, IntegerObj *& obj)
 {
 	ptr = nullptr;
@@ -63,7 +60,6 @@ void RealObj::getReal(Number_ptr & ptr, RealObj *& obj)
 
 StringObj::StringObj(std::string s): Object(String)
 {
-	cout << s << endl;
 	int pos = 0;
 
 	while (1)

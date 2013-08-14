@@ -379,9 +379,13 @@ class ProcedureObj: public Object
 
 		env_ptr env;
 
+		bool builtInFlag;	// indicate whether are build-in procedure or not
+
+		std::string name;	// coordinate with builtInFlag
+
 	public:
 
-		ProcedureObj(const Arg_ptr & h, const ParseTree_ptr & b, env_ptr & _env):  Object(Procedure), argHead(h), body(b), env(_env){}
+		ProcedureObj(const Arg_ptr & h, const ParseTree_ptr & b, env_ptr & _env, const bool & flag = false, const std::string & _name = ""):  Object(Procedure), argHead(h), body(b), env(_env), builtInFlag(flag), name(_name) {}
 
 		virtual ~ProcedureObj() {}
 
@@ -392,6 +396,10 @@ class ProcedureObj: public Object
 		const ParseTree_ptr & getBody() { return body; }
 
 		env_ptr & getEnv() { return env; }
+
+		const bool & getFlag() { return builtInFlag; }
+
+		const std::string & getName() { return name; }
 
 };
 

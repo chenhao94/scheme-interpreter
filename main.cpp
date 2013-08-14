@@ -9,8 +9,9 @@ int main()
 {
 	using namespace std;
 
+	int commentPos;
 	bool cacheEndFlag = false;
-	char tmp[205];
+	string tmp;
 	string cache, sentence;
 	Obj_ptr obj;
 	ParseTree_ptr tree = NULL;
@@ -22,8 +23,11 @@ int main()
 	{
 		if (cache.size() == 0)
 			cout << "> ";
-		cin.getline( tmp, 200 );
+
+		getline(cin, tmp);
 		cache.append(tmp);
+
+		eliminateComment(cache);
 		cacheEndFlag = false;
 
 		while ( cacheEndFlag == false )

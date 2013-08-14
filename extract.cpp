@@ -153,6 +153,8 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 			return;
 		}
 	}
+	else if (cache[pos] == ',')
+		throw syntaxError("illegal use: \',\'");
 	else
 	{
 		commonplace:
@@ -169,5 +171,64 @@ void extract(std::string & sentence, std::string & cache, bool & cacheEndFlag)
 		cacheEndFlag = false;
 		cache.erase(0, pos);
 		return;
+	}
+}
+
+void eliminateComment(std::string &s)
+{
+	int pos = 0, size = s.size();
+	bool quoteFlag = false;
+	while (pos < size)
+	{
+		if (s[pos]=='#')
+		{
+			++pos;
+
+			if (s[pos]=='\\')
+				pos+=2;
+
+			goto commonplace;
+		}
+		else if (s[pos]=='\"')
+		{
+			doubleQuotation:
+			++pos;
+			quoteFlag = true;
+
+			while (pos<size)
+			{
+				if (s[pos]=='\"')
+				{
+					quoteFlag = false;
+					++pos;
+					break;
+				}
+				else if (s[pos]=='\\')
+					pos += 2;
+				else
+					++pos;
+			}
+		}
+		else
+		{
+			commonplace:
+			while (pos<size)
+			{
+				if (s[pos]=='(' || s[pos]==')' || s[pos]=='\'' || s[pos]=='`' || s[pos]==',' || isspace(s[pos]))
+				{
+					++pos;
+					break;
+				}
+				else if (s[pos]=='\"')
+					break;
+				else if (s[pos]==';')
+				{
+					s.erase(pos);
+					return;
+				}
+				else
+					++pos;
+			}
+		}
 	}
 }

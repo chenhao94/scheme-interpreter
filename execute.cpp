@@ -40,7 +40,14 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 	{
 		obj = findIden(env, token);
 		if (obj.get() == nullptr)
-			throw syntaxError("Undefined identifier: " + token);
+		{
+			if (builtInProcedure.find(token) == builtInProcedure.end())
+				throw syntaxError("Undefined identifier: " + token);
+			Arg_ptr nullArg(nullptr);
+			ParseTree_ptr nullTree(nullptr);
+			env_ptr nullEnv(nullptr);
+			obj = Obj_ptr(new ProcedureObj(nullArg, nullTree, nullEnv, true, token));
+		}
 		return obj;
 	}
 
@@ -156,7 +163,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 
 		if (obj)	//define by user
 		{
-			return evaluateUserDefined(obj, head);
+			return evaluateUserDefined(obj, head, env);
 		}
 		else		// built-in
 		{
@@ -198,6 +205,8 @@ void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, 
 	if (!isdigit(token[0]) && token[0]!='.')
 		numberFlag = false;
 	if (token[token_size-1]=='/')
+		numberFlag = false;
+	if (token == ".")
 		numberFlag = false;
 
 	if (numberFlag)
