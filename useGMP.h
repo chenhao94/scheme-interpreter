@@ -13,5 +13,9 @@ typedef mpz_class bigInteger;	// intergers
 typedef mpq_class bigRational;	// exact rational numbers 	(fraction)
 typedef mpf_class bigReal;		// inexact real numbers		(float)
 
+bigInteger countGCD(const bigInteger &, const bigInteger &);
+
+bigInteger countLCM(const bigInteger &, const bigInteger &);
+
 #endif
 

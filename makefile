@@ -1,11 +1,14 @@
-main : 	compilingError.h useGMP.h objects.o environments.o parse.o 	\
+main : 	error.h useGMP.o objects.o environments.o parse.o 	\
 		execute.o builtIn.o userDefined.o extract.o main.o parseTreePrinter
-	g++ main.o objects.o environments.o parse.o execute.o builtIn.o \
+	g++ main.o useGMP.o objects.o environments.o parse.o execute.o builtIn.o \
 		userDefined.o extract.o -lm -std=c++11 -lgmp -lgmpxx -o main -g
 
-main.o : main.cpp extract.h parse.h execute.h compilingError.h
+main.o : main.cpp extract.h parse.h execute.h error.h
 	g++ main.cpp -c -std=c++11 -lgmp -lgmpxx -g
  
+useGMP.o :	useGMP.cpp useGMP.h
+	g++ useGMP.cpp -c -std=c++11 -lgmp -lgmpxx -g
+
 objects.o :	objects.cpp objects.h
 	g++ objects.cpp -c -std=c++11 -lgmp -lgmpxx -g
 

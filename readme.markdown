@@ -17,15 +17,22 @@ I believe the users will not use the definition above. Redefining the built-in s
 The followings are available in the interpreter now.
 * if, cond, case
 * define
+* set!
 * lamdba
 
 ##Procedure
 The followings are available in the interpreter now.
 
 * +, -, \*, /
-* <, >, <=, >=, eq?, eqv? equal?
-* cons, car, cdr
+* quotient, modulo, remainder
+* <, >, <=, >=, =
 * min, max
+* gcd, lcm
+* eq?, eqv?, equal?
+* cons, car, cdr
+* and, or
+* symbol?, string?, number?, bool?, list?
+* string=?, string<?, string>?, string<=?, string>=?
 
 ##Postscript
 According to the requirement, the interpreter is programmed individually, but there are some inspiring talks with Zhuoyue Zhao, my classmate.

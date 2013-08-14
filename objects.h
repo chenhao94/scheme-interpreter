@@ -17,7 +17,7 @@
 #ifndef  __OBJECTS_H____
 #define  __OBJECTS_H____
 #include "useGMP.h"
-#include "compilingError.h"
+#include "error.h"
 #include <string>
 #include <memory>
 
@@ -66,7 +66,11 @@ Obj_ptr Add (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Subtract (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Multiply (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Divide (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
-Obj_ptr Module (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Quotient(const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Modulo (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr Remainder (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr GCD (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr LCM (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Not (const Obj_ptr &aPtr);
 Obj_ptr And (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
@@ -101,6 +105,8 @@ T operator* (const T &a, const T &b)
 template <class T, class U = typename T::__ObjectBaseType>
 T operator/ (const T &a, const T &b)
 {
+	if (b.getValue() == 0)
+		throw runtimeError("divided by zero");
 	T ans(a.getValue() / b.getValue());
 	return ans;
 }
@@ -242,7 +248,9 @@ class IntegerObj: public NumberObj
 
 		friend RationalObj operator/ (const IntegerObj &, const IntegerObj &);
 		
-		friend IntegerObj operator% (const IntegerObj &, const IntegerObj &);
+		friend IntegerObj Mod(const IntegerObj &, const IntegerObj &);
+
+		friend IntegerObj Rem(const IntegerObj &, const IntegerObj &);
 };
 
 

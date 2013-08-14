@@ -8,7 +8,7 @@
 #include "parse.h"
 #include "environments.h"
 #include "execute.h"
-#include "compilingError.h"
+#include "error.h"
 #include "builtIn.h"
 #include <string>
 

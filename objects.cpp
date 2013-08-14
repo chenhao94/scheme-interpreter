@@ -208,13 +208,33 @@ BoolObj operator|| (const BoolObj &a, const BoolObj &b)
 
 RationalObj operator/ (const IntegerObj &a, const IntegerObj &b)
 {
+	if (b.value == 0)
+		throw runtimeError("divided by zero");
 	RationalObj ans(a.value, b.value);
 	return ans;
 }
 
-IntegerObj operator% (const IntegerObj &a, const IntegerObj &b)
+IntegerObj Mod (const IntegerObj &a, const IntegerObj &b)
 {
-	IntegerObj ans(a.value % b.value);
+	if (b.value == 0)
+		throw runtimeError("divided by zero");
+	bigInteger modAns = a.value % b.value;
+	if ((b.value<0 && modAns>0) || (b.value>0 && modAns<0))
+		modAns+=b.value;
+	IntegerObj ans(modAns);
+	return ans;
+}
+
+IntegerObj Rem (const IntegerObj &a, const IntegerObj &b)
+{
+	if (b.value == 0)
+		throw runtimeError("divided by zero");
+	bigInteger remAns = a.value % b.value;
+	if (a.value<0 && remAns>0)
+		remAns-=abs(b.value);
+	if (a.value>0 && remAns<0)
+		remAns+=abs(b.value);
+	IntegerObj ans(remAns);
 	return ans;
 }
 
@@ -271,6 +291,10 @@ bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 bool lessThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *aa = aPtr.get(), *bb = bPtr.get();
+
+	if (aPtr->Type == String && bPtr->Type == String)
+		return ( *static_cast<StringObj*>(aPtr.get()) < *static_cast<StringObj*>(bPtr.get()) );
+	
 	if (aa->Type!=Number || bb->Type!=Number)
 		throw syntaxError("Unexpected type");
 
@@ -303,6 +327,10 @@ bool lessThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 bool greaterThan (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *aa = aPtr.get(), *bb = bPtr.get();
+
+	if (aPtr->Type == String && bPtr->Type == String)
+		return ( *static_cast<StringObj*>(aPtr.get()) > *static_cast<StringObj*>(bPtr.get()) );
+	
 	if (aa->Type!=Number || bb->Type!=Number)
 		throw syntaxError("Unexpected type");
 
@@ -477,6 +505,25 @@ Obj_ptr Divide (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return Obj_ptr(new RationalObj( *pa / *pb ));
 }
 
+Obj_ptr Quotient(const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+{
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT( static_cast<NumberObj*>(aa)->numType ),
+			   bT( static_cast<NumberObj*>(bb)->numType );
+	if (aT != Integer || bT != Integer)
+		throw syntaxError("Unexpected type");
+
+	IntegerObj *a(static_cast<IntegerObj*>(aa)), *b(static_cast<IntegerObj*>(bb));
+	if (b->getValue() == 0)
+		throw runtimeError("divided by zero");
+
+	Int_ptr ptr( new IntegerObj( a->getValue() / b->getValue() ) );
+	return ptr;
+}
+
 Obj_ptr Modulo (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 {
 	Object *aa = aPtr.get(), *bb = bPtr.get();
@@ -490,7 +537,61 @@ Obj_ptr Modulo (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 
 	IntegerObj *a(static_cast<IntegerObj*>(aa)), *b(static_cast<IntegerObj*>(bb));
 
-	Int_ptr ptr( new IntegerObj( *a % *b ) );
+	Int_ptr ptr( new IntegerObj( Mod( *a, *b) ) );
+	return ptr;
+}
+
+Obj_ptr Remainder (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+{
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT( static_cast<NumberObj*>(aa)->numType ),
+			   bT( static_cast<NumberObj*>(bb)->numType );
+	if (aT != Integer || bT != Integer)
+		throw syntaxError("Unexpected type");
+
+	IntegerObj *a(static_cast<IntegerObj*>(aa)), *b(static_cast<IntegerObj*>(bb));
+
+	Int_ptr ptr( new IntegerObj( Rem(*a, *b) ) );
+	return ptr;
+}
+
+Obj_ptr GCD (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+{
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT( static_cast<NumberObj*>(aa)->numType ),
+			   bT( static_cast<NumberObj*>(bb)->numType );
+	if (aT != Integer || bT != Integer)
+		throw syntaxError("Unexpected type");
+
+	IntegerObj *a(static_cast<IntegerObj*>(aa)), *b(static_cast<IntegerObj*>(bb));
+	bigInteger av( a->getValue() ), bv( b->getValue() );
+	bigInteger ans;
+
+	Int_ptr ptr( new IntegerObj( countGCD(av, bv) ) );
+	return ptr;
+}
+
+Obj_ptr LCM (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
+{
+	Object *aa = aPtr.get(), *bb = bPtr.get();
+	if (aa->Type != Number || bb->Type != Number)
+		throw syntaxError("Unexpected type");
+
+	NumberType aT( static_cast<NumberObj*>(aa)->numType ),
+			   bT( static_cast<NumberObj*>(bb)->numType );
+	if (aT != Integer || bT != Integer)
+		throw syntaxError("Unexpected type");
+
+	IntegerObj *a(static_cast<IntegerObj*>(aa)), *b(static_cast<IntegerObj*>(bb));
+	bigInteger av = a->getValue(), bv = b->getValue();
+
+	Int_ptr ptr( new IntegerObj( countLCM(av, bv) ) );
 	return ptr;
 }
 

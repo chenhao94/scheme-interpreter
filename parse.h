@@ -7,7 +7,7 @@
 
 #include "objects.h"
 #include "environments.h"
-#include "compilingError.h"
+#include "error.h"
 #include <string>
 
 class ParseTree;

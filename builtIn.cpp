@@ -4,6 +4,8 @@
 
 #include "builtIn.h"
 
+ObjectSet ListCheckVisitedSet;
+
 Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, env_ptr & env)
 {
 	if (name=="+")
@@ -12,7 +14,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		Obj_ptr ans;
 
 		if (now == nullptr)
-			throw syntaxError("at least one arugument");
+			return Obj_ptr( new IntegerObj(0) );
 
 		if (now->obj->Type != Number)
 			throw syntaxError("unexpected type");
@@ -60,7 +62,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		Obj_ptr ans;
 
 		if (now == nullptr)
-			throw syntaxError("at least one arugument");
+			return Obj_ptr( new IntegerObj(1) );
 
 		if (now->obj->Type != Number)
 			throw syntaxError("unexpected type");
@@ -101,6 +103,117 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		}
 
 		return ans;
+	}
+	else if (name=="quotient")
+	{
+		Para_ptr para1 = para, para2;
+		Obj_ptr ans;
+
+		if (para1 == nullptr || para1->next == nullptr || para1->next->next != nullptr)
+			throw syntaxError("quotient: expect 2 arguments");
+
+		para2 = para1->next;
+		ans = Quotient(para1->obj, para2->obj);
+
+		return ans;
+	}
+	else if (name=="modulo")
+	{
+		Para_ptr para1 = para, para2;
+		Obj_ptr ans;
+
+		if (para1 == nullptr || para1->next == nullptr || para1->next->next != nullptr)
+			throw syntaxError("quotient: expect 2 arguments");
+
+		para2 = para1->next;
+		ans = Modulo(para1->obj, para2->obj);
+
+		return ans;
+	}
+	else if (name=="remainder")
+	{
+		Para_ptr para1 = para, para2;
+		Obj_ptr ans;
+
+		if (para1 == nullptr || para1->next == nullptr || para1->next->next != nullptr)
+			throw syntaxError("quotient: expect 2 arguments");
+
+		para2 = para1->next;
+		ans = Remainder(para1->obj, para2->obj);
+
+		return ans;
+	}
+	else if (name=="gcd")
+	{
+		Para_ptr now = para, last;
+		Obj_ptr ans;
+
+		if (now == nullptr)
+			return Obj_ptr( new IntegerObj(0) );
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		last = now;
+		now = now->next;
+
+		while (now != nullptr)
+		{
+			ans = GCD(ans, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		return ans;
+	}
+	else if (name=="lcm")
+	{
+		Para_ptr now = para, last;
+		Obj_ptr ans;
+
+		if (now == nullptr)
+			return Obj_ptr( new IntegerObj(1) );
+
+		if (now->obj->Type != Number)
+			throw syntaxError("unexpected type");
+
+		ans = now->obj;
+		last = now;
+		now = now->next;
+
+		while (now != nullptr)
+		{
+			ans = LCM(ans, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		return ans;
+	}
+	else if (name=="=")
+	{
+		if (para == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		bool value = true;
+		
+		while (now != nullptr)
+		{
+			if (now->obj->Type!=Number)
+				throw syntaxError("expect numbers here");
+			value = value && equal(last->obj, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
 	}
 	else if (name=="<")
 	{
@@ -190,9 +303,125 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		Bool_ptr ptr( new BoolObj(value) );
 		return ptr;
 	}
-	else if (name=="gcd")
+	else if (name=="string=?")
 	{
-		//W.T.F.
+		if (para == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		bool value = true;
+		
+		while (now != nullptr)
+		{
+			if (now->obj->Type!=String)
+				throw syntaxError("expect strings here");
+			value = value && equal(last->obj, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
+	}
+	else if (name=="string<?")
+	{
+		if (para == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		bool value = true;
+		
+		while (now != nullptr)
+		{
+			if (now->obj->Type!=String)
+				throw syntaxError("expect strings here");
+			value = value && lessThan(last->obj, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
+	}
+	else if (name=="string>?")
+	{
+		if (para == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		bool value = true;
+		
+		while (now != nullptr)
+		{
+			if (now->obj->Type!=String)
+				throw syntaxError("expect strings here");
+			value = value && greaterThan(last->obj, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
+	}
+	else if (name=="string<=?")
+	{
+		if (para == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		bool value = true;
+		
+		while (now != nullptr)
+		{
+			if (now->obj->Type!=String)
+				throw syntaxError("expect strings here");
+			value = value && lessEq(last->obj, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
+	}
+	else if (name=="string>=?")
+	{
+		if (para == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		Para_ptr now = para->next, last = para;
+
+		if (now == nullptr)
+			throw syntaxError("at least two aruguments");
+
+		bool value = true;
+		
+		while (now != nullptr)
+		{
+			if (now->obj->Type!=String)
+				throw syntaxError("expect strings here");
+			value = value && greaterEq(last->obj, now->obj);
+			last = now;
+			now = now->next;
+		}
+
+		Bool_ptr ptr( new BoolObj(value) );
+		return ptr;
 	}
 	else if (name=="max")
 	{
@@ -240,6 +469,47 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		return ans;
 	}
+	else if (name=="and")
+	{
+		Para_ptr now = para;
+		Obj_ptr ans;
+
+		if (now == nullptr)
+			return Obj_ptr( new BoolObj(true) );
+
+		ans = now->obj;
+		now = now->next;
+
+		while (now != nullptr)
+		{
+			if ( ans->Type==Bool && static_cast<BoolObj*>(ans.get())->getValue() == false )
+				return ans;
+			ans = now->obj;
+			now = now->next;
+		}
+
+		return ans;
+	}
+	else if (name=="or")
+	{
+		Para_ptr now = para;
+		Obj_ptr ans;
+
+		if (now == nullptr)
+			return Obj_ptr( new BoolObj(false) );
+
+		ans = now->obj;
+		now = now->next;
+
+		while (now != nullptr)
+		{
+			if ( !(now->obj->Type==Bool && static_cast<BoolObj*>(now->obj.get())->getValue() == false) )
+				ans = now->obj;
+			now = now->next;
+		}
+
+		return ans;
+	}
 	else if (name=="exact->inexact")
 	{
 		//W.T.F.
@@ -247,6 +517,52 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	else if (name=="inexact->exact")
 	{
 		//W.T.F.
+	}
+	else if (name=="symbol?")
+	{
+		Para_ptr now = para;
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("symbol?: expect 1 argument");
+		Obj_ptr obj = para->obj;
+		
+		return Obj_ptr( new BoolObj(obj->Type == Symbol) );
+	}
+	else if (name=="number?")
+	{
+		Para_ptr now = para;
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("number?: expect 1 argument");
+		Obj_ptr obj = para->obj;
+		
+		return Obj_ptr( new BoolObj(obj->Type == Number) );
+	}
+	else if (name=="bool?")
+	{
+		Para_ptr now = para;
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("bool?: expect 1 argument");
+		Obj_ptr obj = para->obj;
+		
+		return Obj_ptr( new BoolObj(obj->Type == Bool) );
+	}
+	else if (name=="list?")
+	{
+		Para_ptr now = para;
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("list?: expect 1 argument");
+		Obj_ptr obj = para->obj;
+		
+		ListCheckVisitedSet.clear();
+		return Obj_ptr( new BoolObj( isList(obj) ) );
+	}
+	else if (name=="string?")
+	{
+		Para_ptr now = para;
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("string?: expect 1 argument");
+		Obj_ptr obj = para->obj;
+		
+		return Obj_ptr( new BoolObj(obj->Type == String) );
 	}
 	else if (name=="cons")
 	{
@@ -266,7 +582,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		
 		Object* obj = para->obj.get();
 		if (obj->Type != Pair)
-			throw("unexpected type");
+			throw syntaxError("unexpected type");
 
 		return static_cast<PairObj*>(obj)->getCar();
 	}
@@ -277,7 +593,7 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		
 		Object *obj = para->obj.get();
 		if (obj->Type != Pair)
-			throw("unexpected type");
+			throw syntaxError("unexpected type");
 
 		return static_cast<PairObj*>(obj)->getCdr();
 	}
@@ -642,4 +958,16 @@ Obj_ptr evaluateCaseClause(const Obj_ptr & key, const ParseTree_ptr & clause, en
 	return nullptr;
 }
 
+bool isList( const Obj_ptr & obj )
+{
+	if (obj->Type != Pair)
+		return false;
+	if (obj->ExternalRep() == "( )")
+		return true;
+	if ( ListCheckVisitedSet.find( obj ) !=
+			ListCheckVisitedSet.end() )
+		return false;
 
+	ListCheckVisitedSet.insert( obj );
+	return isList( static_cast<PairObj*>(obj.get())->getCdr() );
+}

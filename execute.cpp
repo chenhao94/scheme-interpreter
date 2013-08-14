@@ -7,7 +7,7 @@
 
 builtInSet builtInSyntax({ "if","cond","case","else","define","set!","lambda","quote","quasiquote" });
 
-builtInSet builtInProcedure({"+","-","*","/","<",">","<=",">=","gcd","max","min","exact->inexact","inexact->exact","cons","car","cdr","eq?","eqv?","equal?"});
+builtInSet builtInProcedure({"+","-","*","/","=","<",">","<=",">=","modulo","gcd","lcm","quotient","remainder","max","min","exact->inexact","inexact->exact","symbol?","string?","number?","bool?","list?","and","or","string=?","string<?","string>?","string<=?","string>=?","cons","car","cdr","eq?","eqv?","equal?"});
 
 Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 {
@@ -202,18 +202,18 @@ void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, 
 	numberFlag = true;
 	rationalFlag = realFlag = false;
 
-	if (!isdigit(token[0]) && token[0]!='.')
+	if (!isdigit(token[0]) && token[0]!='.' && token[0]!='-')
 		numberFlag = false;
 	if (token[token_size-1]=='/')
 		numberFlag = false;
-	if (token == ".")
+	if (token == "." || token=="-.")
 		numberFlag = false;
 
 	if (numberFlag)
 	{
 		for (int i=0; i<token_size; ++i)
 		{
-			if (!isdigit(token[i]) && token[i]!='.' && token[i]!='/')
+			if (!isdigit(token[i]) && token[i]!='.' && token[i]!='/' && (token[i]!='-' || i!=0))
 			{
 				numberFlag = false;
 				break;
@@ -267,9 +267,19 @@ Obj_ptr makeList(const ParseTree_ptr & tree)
 		return obj;
 	}
 
-	Obj_ptr o1( new SymbolObj(tree->getToken()) );
+	std::string token = tree->getToken();
 
-	obj = Obj_ptr( new PairObj(o1, makeList(tree->getBrother())) );
+	if (token==".")
+	{
+		if (tree->getBrother() == nullptr || tree->getBrother()->getBrother() != nullptr)
+			throw syntaxError("illegal use: \'.\'");
+		obj = Obj_ptr( new SymbolObj(tree->getBrother()->getToken()) );
+	}
+	else
+	{
+		Obj_ptr o1( new SymbolObj(token) );
+		obj = Obj_ptr( new PairObj(o1, makeList(tree->getBrother())) );
+	}
 	return obj;
 }
 

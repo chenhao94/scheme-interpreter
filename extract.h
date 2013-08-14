@@ -5,7 +5,7 @@
 #ifndef ___EXTRACT_H____
 #define ___EXTRACT_H____
 
-#include "compilingError.h"
+#include "error.h"
 #include <string>
 void extract(std::string & sentence, std::string & cache, bool &);
 

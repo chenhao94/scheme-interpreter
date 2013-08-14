@@ -3,7 +3,7 @@
 #include "extract.h"
 #include "parse.h"
 #include "execute.h"
-#include "compilingError.h"
+#include "error.h"
 
 int main()
 {
@@ -41,6 +41,12 @@ int main()
 					cout << obj->ExternalRep() << endl;
 			}
 			catch (syntaxError err)
+			{
+				cache.clear();
+				cacheEndFlag = true;
+				cout << err.getMsg() << endl;
+			}
+			catch (runtimeError err)
 			{
 				cache.clear();
 				cacheEndFlag = true;

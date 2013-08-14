@@ -9,7 +9,7 @@
 #include "parse.h"
 #include "builtIn.h"
 #include "userDefined.h"
-#include "compilingError.h"
+#include "error.h"
 #include <string>
 
 static env_ptr global( new Environment );
