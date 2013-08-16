@@ -19,6 +19,7 @@
 #include "useGMP.h"
 #include "error.h"
 #include <string>
+#include <set>
 #include <memory>
 
 enum objType {Bool, Char, Number, String, Pair, Symbol, Procedure, Promise};
@@ -57,6 +58,7 @@ typedef std::shared_ptr<Arguments> Arg_ptr;
 typedef std::shared_ptr<Parameters> Para_ptr;
 typedef std::shared_ptr<ParseTree> ParseTree_ptr;
 typedef std::shared_ptr<Environment> env_ptr;
+typedef std::set<Obj_ptr> ObjectSet;
 
 bool equal (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 bool notEqual (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
@@ -78,6 +80,7 @@ Obj_ptr And (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr descend (const Obj_ptr &aPtr);
 Obj_ptr Append( const ParseTree_ptr &, env_ptr &);
+bool emptyPair(const Obj_ptr &);
 
 template <class T, class U = typename T::__ObjectBaseType>
 bool operator==(const T &a, const T &b)

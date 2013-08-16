@@ -24,8 +24,6 @@ Obj_ptr evaluateCaseClause(const Obj_ptr &, const ParseTree_ptr &, env_ptr &);
 
 bool isList( const Obj_ptr & );
 
-bool emptyPair(const Obj_ptr &);
-
 Obj_ptr Append( const ParseTree_ptr &, env_ptr &);
 
 #endif

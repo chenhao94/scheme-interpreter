@@ -173,9 +173,37 @@ std::string StringObj::ExternalRep()
 
 std::string PairObj::ExternalRep()
 {
-	if ( obj1 == NULL && obj2 == NULL)
+	if ( obj1 == nullptr && obj2 == nullptr)
 		return "( )";
-	return "( " + obj1->ExternalRep() + "  " + obj2->ExternalRep() + " )";
+
+	std::string str("(");
+	ObjectSet ExternalCheckSet({});
+	Obj_ptr obj = obj2;
+
+	str.append( " " + obj1->ExternalRep() );
+
+	while (!emptyPair(obj))
+	{
+		if ( ExternalCheckSet.find(obj) != 
+				ExternalCheckSet.end())
+			return "#<closure>";
+
+		ExternalCheckSet.insert(obj);
+
+		if (obj->Type != Pair)
+		{
+			str.append(" . " + obj->ExternalRep() + " )");
+			return str;
+		}
+		else
+		{
+			str.append( " " + static_cast<PairObj*>(obj.get())->obj1->ExternalRep() );
+			obj = static_cast<PairObj*>(obj.get())->obj2;
+		}
+	}
+
+	str.append(" )");
+	return str;
 }
 
 std::string SymbolObj::ExternalRep()
@@ -652,4 +680,14 @@ Obj_ptr descend (const Obj_ptr &aPtr)
 	}
 
 	return aPtr;
+}
+
+bool emptyPair(const Obj_ptr & obj)
+{
+	if (obj->Type != Pair)
+		return false;
+	if (static_cast<PairObj*>(obj.get())->getCar() == nullptr &&
+		static_cast<PairObj*>(obj.get())->getCdr() == nullptr)
+		return true;
+	return false;
 }

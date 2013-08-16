@@ -1045,12 +1045,3 @@ Obj_ptr Append( const ParseTree_ptr & tree, env_ptr & env)
 	return copyObj;
 }
 
-bool emptyPair(const Obj_ptr & obj)
-{
-	if (obj->Type != Pair)
-		return false;
-	if (static_cast<PairObj*>(obj.get())->getCar() == nullptr &&
-		static_cast<PairObj*>(obj.get())->getCdr() == nullptr)
-		return true;
-	return false;
-}
