@@ -598,6 +598,22 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		return ptr;
 	}
+	else if (name=="force")
+	{
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("force: expect 1 argument");
+		
+		Obj_ptr obj = para->obj;
+		if (obj->Type != Promise)
+			return obj;
+
+		PromiseObj* _promise = static_cast<PromiseObj*>(obj.get());
+
+		if (_promise->getAnswer() != nullptr)
+			return _promise->getAnswer();
+
+		return _promise->getAnswer() = evaluate(_promise->getBody(), _promise->getEnv());
+	}
 }
 
 Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_ptr &env)
@@ -878,6 +894,14 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 		}
 
 		return ans;
+	}
+	else if (name=="delay")
+	{
+		ParseTree_ptr now = tree;
+		if (now == nullptr || now->getBrother() != nullptr)
+			throw syntaxError("delay: expect 1 argument here");
+
+		return Promise_ptr(new PromiseObj(now, env));
 	}
 }
 

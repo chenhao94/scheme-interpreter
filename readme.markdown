@@ -21,6 +21,7 @@ The followings are available in the interpreter now.
 * lamdba
 * and, or
 * quote, quasiquote(expect ',@')
+* delay
 
 ##Procedure
 The followings are available in the interpreter now.
@@ -34,6 +35,7 @@ The followings are available in the interpreter now.
 * cons, car, cdr
 * symbol?, string?, number?, bool?, list?
 * string=?, string<?, string>?, string<=?, string>=?
+* force
 
 ##Postscript
 According to the requirement, the interpreter is programmed individually, but there are some inspiring talks with Zhuoyue Zhao, my classmate.

@@ -21,7 +21,7 @@
 #include <string>
 #include <memory>
 
-enum objType {Bool, Char, Number, String, Pair, Symbol, Procedure};
+enum objType {Bool, Char, Number, String, Pair, Symbol, Procedure, Promise};
 enum NumberType { Integer, Rational, Real/*, Complex */};	// First 3 are available now
 
 class Object;
@@ -35,6 +35,7 @@ class StringObj;
 class PairObj;
 class SymbolObj;
 class ProcedureObj;
+class PromiseObj;
 class ParseTree;
 class Arguments;
 class Parameters;
@@ -51,6 +52,7 @@ typedef std::shared_ptr<StringObj> String_ptr;
 typedef std::shared_ptr<PairObj> Pair_ptr;
 typedef std::shared_ptr<SymbolObj> Symbol_ptr;
 typedef std::shared_ptr<ProcedureObj> Procedure_ptr;
+typedef std::shared_ptr<PromiseObj> Promise_ptr;
 typedef std::shared_ptr<Arguments> Arg_ptr;
 typedef std::shared_ptr<Parameters> Para_ptr;
 typedef std::shared_ptr<ParseTree> ParseTree_ptr;
@@ -410,6 +412,32 @@ class ProcedureObj: public Object
 
 		const std::string & getName() { return name; }
 
+};
+
+class PromiseObj: public Object
+{
+
+	private:
+
+		ParseTree_ptr body;
+
+		env_ptr env;
+
+		Obj_ptr answer;
+
+	public:
+
+		PromiseObj(const ParseTree_ptr & b, env_ptr & _env):  Object(Promise), body(b), env(_env), answer(nullptr) {}
+
+		virtual ~PromiseObj() {}
+
+		std::string ExternalRep() { return "#<promise>"; }
+
+		const ParseTree_ptr & getBody() { return body; }
+
+		env_ptr & getEnv() { return env; }
+
+		Obj_ptr & getAnswer() { return answer; }
 };
 
 class Arguments
