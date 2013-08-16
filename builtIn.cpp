@@ -520,6 +520,15 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		ListCheckVisitedSet.clear();
 		return Obj_ptr( new BoolObj( isList(obj) ) );
 	}
+	else if (name=="pair?")
+	{
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("list?: expect 1 argument");
+		Obj_ptr obj = para->obj;
+
+		return Obj_ptr(new BoolObj(obj->Type == Pair &&
+									!emptyPair(obj)) );
+	}
 	else if (name=="string?")
 	{
 		Para_ptr now = para;
@@ -638,6 +647,14 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		now = now->next;
 		return Apply(func, now, env);
+	}
+	else if (name=="display")
+	{
+		if (para == nullptr || para->next != nullptr)
+			throw syntaxError("force: expect 1 argument");
+
+		Display(para->obj);
+		return nullptr;
 	}
 }
 
@@ -927,6 +944,17 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 			throw syntaxError("delay: expect 1 argument here");
 
 		return Promise_ptr(new PromiseObj(now, env));
+	}
+	else if (name=="begin")
+	{
+		ParseTree_ptr now = tree;
+		Obj_ptr obj = nullptr;
+		while (now != nullptr)
+		{
+			obj = evaluate(now, env);
+			now = now->getBrother();
+		}
+		return obj;
 	}
 }
 

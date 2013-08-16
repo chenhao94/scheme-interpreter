@@ -11,7 +11,29 @@ And I suppose that users will never redefine the preserved keywords (e.g., *if* 
     
     (define define 1)
 
-I believe the users will not use the definition above. Redefining the built-in syntax is banned. You can redefine the built-in precedures. It might works, but sometimes may leads to unexpected outcomes.
+I believe the users will not use the definition above. Redefining the built-in syntax is banned( the interpreter will ignore it). You can redefine the built-in procedures. It might works, but sometimes may leads to unexpected outcomes.
+
+##Compilation and Run
+
+You should install the GNU MP 5.1.2 first. If your operating system have Advanced Packaging Tool (apt), then,
+
+	sudo apt-get install libgmp3c2 libgmp10-doc libgmp3-dev libgmpxx4ldbl
+
+Then go to the root directory of the interpreter
+
+	make
+
+Then it will be compiled successfully. And you can type the following command to run it
+
+	./main
+
+And you will see
+
+	Welcome to CH's scheme Interpreter!!
+	> 
+
+Enjoy it!
+
 
 ##Syntax
 The followings are available in the interpreter now.
@@ -23,6 +45,7 @@ The followings are available in the interpreter now.
 * and, or
 * quote, quasiquote(expect ',@')
 * delay
+* begin
 
 ##Procedure
 The followings are available in the interpreter now.
@@ -34,11 +57,12 @@ The followings are available in the interpreter now.
 * gcd, lcm
 * eq?, eqv?, equal?
 * cons, car, cdr
-* symbol?, string?, number?, bool?, list?
+* symbol?, string?, number?, bool?, list?, pair?
 * string=?, string<?, string>?, string<=?, string>=?
 * force
 * append
 * apply
+* display
 
 ##Postscript
 According to the requirement, the interpreter is programmed individually, but there are some inspiring talks with Zhuoyue Zhao, my classmate.

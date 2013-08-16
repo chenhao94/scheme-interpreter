@@ -8,6 +8,7 @@
 #include "environments.h"
 #include "execute.h"
 #include "userDefined.h"
+#include "display.h"
 #include "error.h"
 #include <string>
 #include <set>
