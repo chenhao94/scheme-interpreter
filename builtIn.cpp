@@ -903,6 +903,11 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 
 		return Promise_ptr(new PromiseObj(now, env));
 	}
+	else if (name=="append")
+	{
+		ParseTree_ptr now = tree;
+		return Append(now, env);
+	}
 }
 
 Obj_ptr evaluateCondClause(const ParseTree_ptr & clause, env_ptr & env)
@@ -987,7 +992,7 @@ bool isList( const Obj_ptr & obj )
 {
 	if (obj->Type != Pair)
 		return false;
-	if (obj->ExternalRep() == "( )")
+	if (emptyPair(obj))
 		return true;
 	if ( ListCheckVisitedSet.find( obj ) !=
 			ListCheckVisitedSet.end() )
@@ -995,4 +1000,57 @@ bool isList( const Obj_ptr & obj )
 
 	ListCheckVisitedSet.insert( obj );
 	return isList( static_cast<PairObj*>(obj.get())->getCdr() );
+}
+
+Obj_ptr Append( const ParseTree_ptr & tree, env_ptr & env)
+{
+	if (tree == nullptr)
+		return Pair_ptr( new PairObj(nullptr, nullptr) );
+
+	Obj_ptr obj = evaluate(tree, env);
+
+	if (tree->getBrother() == nullptr)
+		return obj;
+
+	//--------check obj and find the last empty list------
+	if (obj->Type != Pair)
+		throw syntaxError("unexpected type");
+	if (emptyPair(obj))	
+		return Append(tree->getBrother(), env);
+
+	Obj_ptr copyObj( new PairObj( *static_cast<PairObj*>(obj.get()) ) ), last, copyLast, copyTmp;
+	last = copyLast = copyObj;
+	ObjectSet AppendCheckSet({});
+
+	while ( !emptyPair(static_cast<PairObj*>(last.get())->obj2) )
+	{
+		if ( AppendCheckSet.find(last) !=
+				AppendCheckSet.end())
+			throw syntaxError("unexpected type");
+
+		last = static_cast<PairObj*>(last.get())->obj2;
+
+		if (last->Type != Pair)
+			throw syntaxError("unexpected type");
+
+		copyTmp = Obj_ptr( new PairObj(*static_cast<PairObj*>(last.get())) );
+		static_cast<PairObj*>(copyLast.get())->obj2 = copyTmp;
+		copyLast = copyTmp;
+		last = copyLast;
+	}
+	//----------------------------------------------------
+
+	static_cast<PairObj*>(last.get())->obj2 = Append(tree->getBrother(), env);
+	
+	return copyObj;
+}
+
+bool emptyPair(const Obj_ptr & obj)
+{
+	if (obj->Type != Pair)
+		return false;
+	if (static_cast<PairObj*>(obj.get())->getCar() == nullptr &&
+		static_cast<PairObj*>(obj.get())->getCdr() == nullptr)
+		return true;
+	return false;
 }

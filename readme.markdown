@@ -15,12 +15,14 @@ I believe the users will not use the definition above. Redefining the built-in s
 
 ##Syntax
 The followings are available in the interpreter now.
+
 * if, cond, case
 * define
 * set!
 * lamdba
 * and, or
 * quote, quasiquote(expect ',@')
+* append
 * delay
 
 ##Procedure

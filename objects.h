@@ -77,6 +77,7 @@ Obj_ptr Not (const Obj_ptr &aPtr);
 Obj_ptr And (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr descend (const Obj_ptr &aPtr);
+Obj_ptr Append( const ParseTree_ptr &, env_ptr &);
 
 template <class T, class U = typename T::__ObjectBaseType>
 bool operator==(const T &a, const T &b)
@@ -357,6 +358,7 @@ class PairObj: public Object
 
 		friend bool operator== (const PairObj &, const PairObj &);
 
+		friend Obj_ptr Append( const ParseTree_ptr &, env_ptr &);
 };
 
 class SymbolObj: public Object
