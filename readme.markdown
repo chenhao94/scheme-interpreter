@@ -22,7 +22,6 @@ The followings are available in the interpreter now.
 * lamdba
 * and, or
 * quote, quasiquote(expect ',@')
-* append
 * delay
 
 ##Procedure
@@ -38,6 +37,8 @@ The followings are available in the interpreter now.
 * symbol?, string?, number?, bool?, list?
 * string=?, string<?, string>?, string<=?, string>=?
 * force
+* append
+* apply
 
 ##Postscript
 According to the requirement, the interpreter is programmed individually, but there are some inspiring talks with Zhuoyue Zhao, my classmate.

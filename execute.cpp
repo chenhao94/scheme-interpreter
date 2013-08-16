@@ -5,9 +5,9 @@
 #include "execute.h"
 #include <cctype>
 
-builtInSet builtInSyntax({ "if","cond","case","else","define","set!","lambda","quote","quasiquote","and","or","delay","append","apply" });
+builtInSet builtInSyntax({ "if","cond","case","else","define","set!","lambda","quote","quasiquote","and","or","delay" });
 
-builtInSet builtInProcedure({"+","-","*","/","=","<",">","<=",">=","modulo","gcd","lcm","quotient","remainder","max","min","exact->inexact","inexact->exact","symbol?","string?","number?","boolean?","list?","string=?","string<?","string>?","string<=?","string>=?","cons","car","cdr","eq?","eqv?","equal?","force"});
+builtInSet builtInProcedure({"+","-","*","/","=","<",">","<=",">=","modulo","gcd","lcm","quotient","remainder","max","min","exact->inexact","inexact->exact","symbol?","string?","number?","boolean?","list?","string=?","string<?","string>?","string<=?","string>=?","cons","car","cdr","eq?","eqv?","equal?","force","append","apply"});
 
 Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 {

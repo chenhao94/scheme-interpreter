@@ -620,6 +620,25 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		return _promise->getAnswer() = evaluate(_promise->getBody(), _promise->getEnv());
 	}
+	else if (name=="append")
+	{
+		Para_ptr now = para;
+		return Append(now);
+	}
+	else if (name=="apply")
+	{
+		Para_ptr now = para;
+
+		if (now == nullptr)
+			throw syntaxError("apply: missing expression");
+
+		Obj_ptr func = now->obj;
+		if (func->Type != Procedure)
+			throw syntaxError("unexpected type");
+
+		now = now->next;
+		return Apply(func, now, env);
+	}
 }
 
 Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_ptr &env)
@@ -909,11 +928,6 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 
 		return Promise_ptr(new PromiseObj(now, env));
 	}
-	else if (name=="append")
-	{
-		ParseTree_ptr now = tree;
-		return Append(now, env);
-	}
 }
 
 Obj_ptr evaluateCondClause(const ParseTree_ptr & clause, env_ptr & env)
@@ -1008,21 +1022,21 @@ bool isList( const Obj_ptr & obj )
 	return isList( static_cast<PairObj*>(obj.get())->getCdr() );
 }
 
-Obj_ptr Append( const ParseTree_ptr & tree, env_ptr & env)
+Obj_ptr Append( const Para_ptr & para)
 {
-	if (tree == nullptr)
+	if (para == nullptr)
 		return Pair_ptr( new PairObj(nullptr, nullptr) );
 
-	Obj_ptr obj = evaluate(tree, env);
+	Obj_ptr obj = para->obj;
 
-	if (tree->getBrother() == nullptr)
+	if (para->next == nullptr)
 		return obj;
 
 	//--------check obj and find the last empty list------
 	if (obj->Type != Pair)
 		throw syntaxError("unexpected type");
 	if (emptyPair(obj))	
-		return Append(tree->getBrother(), env);
+		return Append(para->next);
 
 	Obj_ptr copyObj( new PairObj( *static_cast<PairObj*>(obj.get()) ) ), last, copyLast, copyTmp;
 	last = copyLast = copyObj;
@@ -1046,8 +1060,49 @@ Obj_ptr Append( const ParseTree_ptr & tree, env_ptr & env)
 	}
 	//----------------------------------------------------
 
-	static_cast<PairObj*>(last.get())->obj2 = Append(tree->getBrother(), env);
+	static_cast<PairObj*>(last.get())->obj2 = Append(para->next);
 	
 	return copyObj;
 }
 
+Obj_ptr Apply(const Obj_ptr & func, const Para_ptr & para, env_ptr & env)
+{
+	Para_ptr newPara = nullptr, last = nullptr, pos = para;
+
+	while (pos != nullptr)
+	{
+		if (pos->next != nullptr)
+		{
+			if (newPara == nullptr)
+				newPara = last = Para_ptr( new Parameters(pos->obj) );
+			else
+			{
+				last->next = Para_ptr( new Parameters(pos->obj) );
+				last = last->next;
+			}
+		}
+		else
+		{
+			if (!isList(pos->obj))
+				throw ("unexpected type");
+
+			PairObj* _pair = static_cast<PairObj*>(pos->obj.get());
+			while ( !(_pair->obj1 == nullptr && _pair->obj2 == nullptr) )
+			{
+				if (newPara == nullptr)
+					newPara = last = Para_ptr( new Parameters(_pair->obj1) );
+				else
+				{
+					last->next = Para_ptr( new Parameters(_pair->obj1) );
+					last = last->next;
+				}
+
+				_pair = static_cast<PairObj*>(_pair->obj2.get());
+			}
+		}
+
+		pos = pos->next;
+	}
+
+	return evaluateUserDefined(func, newPara, env);
+}

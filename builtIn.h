@@ -7,6 +7,7 @@
 #include "parse.h"
 #include "environments.h"
 #include "execute.h"
+#include "userDefined.h"
 #include "error.h"
 #include <string>
 #include <set>
@@ -24,6 +25,8 @@ Obj_ptr evaluateCaseClause(const Obj_ptr &, const ParseTree_ptr &, env_ptr &);
 
 bool isList( const Obj_ptr & );
 
-Obj_ptr Append( const ParseTree_ptr &, env_ptr &);
+Obj_ptr Append( const Para_ptr &);
+
+Obj_ptr Apply(const Obj_ptr &, const Para_ptr &, env_ptr &);
 
 #endif

@@ -80,6 +80,7 @@ Obj_ptr And (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr descend (const Obj_ptr &aPtr);
 Obj_ptr Append( const ParseTree_ptr &, env_ptr &);
+Obj_ptr Apply(const Obj_ptr &, const Para_ptr &, env_ptr &);
 bool emptyPair(const Obj_ptr &);
 
 template <class T, class U = typename T::__ObjectBaseType>
@@ -361,7 +362,9 @@ class PairObj: public Object
 
 		friend bool operator== (const PairObj &, const PairObj &);
 
-		friend Obj_ptr Append( const ParseTree_ptr &, env_ptr &);
+		friend Obj_ptr Append( const Para_ptr &);
+
+		friend Obj_ptr Apply( const Obj_ptr &, const Para_ptr &, env_ptr &);
 };
 
 class SymbolObj: public Object
