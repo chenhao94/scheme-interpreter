@@ -469,47 +469,6 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 
 		return ans;
 	}
-	else if (name=="and")
-	{
-		Para_ptr now = para;
-		Obj_ptr ans;
-
-		if (now == nullptr)
-			return Obj_ptr( new BoolObj(true) );
-
-		ans = now->obj;
-		now = now->next;
-
-		while (now != nullptr)
-		{
-			if ( ans->Type==Bool && static_cast<BoolObj*>(ans.get())->getValue() == false )
-				return ans;
-			ans = now->obj;
-			now = now->next;
-		}
-
-		return ans;
-	}
-	else if (name=="or")
-	{
-		Para_ptr now = para;
-		Obj_ptr ans;
-
-		if (now == nullptr)
-			return Obj_ptr( new BoolObj(false) );
-
-		ans = now->obj;
-		now = now->next;
-
-		while (now != nullptr)
-		{
-			if ( !(now->obj->Type==Bool && static_cast<BoolObj*>(now->obj.get())->getValue() == false) )
-				ans = now->obj;
-			now = now->next;
-		}
-
-		return ans;
-	}
 	else if (name=="exact->inexact")
 	{
 		//W.T.F.
@@ -536,11 +495,11 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 		
 		return Obj_ptr( new BoolObj(obj->Type == Number) );
 	}
-	else if (name=="bool?")
+	else if (name=="boolean?")
 	{
 		Para_ptr now = para;
 		if (para == nullptr || para->next != nullptr)
-			throw syntaxError("bool?: expect 1 argument");
+			throw syntaxError("boolean?: expect 1 argument");
 		Obj_ptr obj = para->obj;
 		
 		return Obj_ptr( new BoolObj(obj->Type == Bool) );
@@ -872,11 +831,53 @@ Obj_ptr evaluateSyntax(const std::string &name, const ParseTree_ptr &tree, env_p
 	}
 	else if (name=="quote")
 	{
-		//W.T.F.
+		return Quote(tree);
 	}
 	else if (name=="quasiquote")
 	{
-		//W.T.F.
+		return Quasiquote(tree, env);
+	}
+	else if (name=="and")
+	{
+		ParseTree_ptr now = tree;
+		Obj_ptr ans;
+
+		if (now == nullptr)
+			return Obj_ptr( new BoolObj(true) );
+
+		ans = evaluate(now, env);
+		now = now->getBrother();
+
+		while (now != nullptr)
+		{
+			if ( ans->Type==Bool && static_cast<BoolObj*>(ans.get())->getValue() == false )
+				return ans;
+			ans = evaluate(now, env);
+			now = now->getBrother();
+		}
+
+		return ans;
+	}
+	else if (name=="or")
+	{
+		ParseTree_ptr now = tree;
+		Obj_ptr ans;
+
+		if (now == nullptr)
+			return Obj_ptr( new BoolObj(false) );
+
+		ans = evaluate(tree, env);
+		now = now->getBrother();
+
+		while (now != nullptr)
+		{
+			if ( !(ans->Type==Bool && static_cast<BoolObj*>(ans.get())->getValue() == false) )
+				return ans;
+			ans = evaluate(now, env);
+			now = now->getBrother();
+		}
+
+		return ans;
 	}
 }
 

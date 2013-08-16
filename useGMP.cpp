@@ -21,3 +21,9 @@ bigInteger countLCM(const bigInteger &a, const bigInteger &b)
 	return c;
 }
 
+bigInteger realToInt(const bigReal &r)
+{
+	bigInteger ans;
+	mpz_set_f(ans.get_mpz_t(), r.get_mpf_t());
+	return ans;
+}

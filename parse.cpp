@@ -46,43 +46,40 @@ ParseTree_ptr Parsing(std::string code) // code should be refined first
 			else
 			{
 				code.erase(0,1);
-				ParseTree_ptr context( new ParseTree(code));
-				ParseTree_ptr quote( new ParseTree("\'", context));
-				return quote;
+				ParseTree_ptr context( Parsing(code) );
+				if (code[0]=='\'')
+					return ParseTree_ptr( new ParseTree("\'", context));
+				else
+					return ParseTree_ptr( new ParseTree("`", context));
 			}
 
 		}
-		else if (code[0]=='\'')		//	'( ... )
+		else		//	'( ... ) || `( ... )
 		{
-			ParseTree_ptr quote, lastName(NULL), newName;
-			std::string name;
-			int pos = 2;
-
-			if (code.back()!=')')
-				throw syntaxError("expected a \')\' to close \'(\'");
-
-			while (getToken(name, code, pos))
-			{
-				newName = ParseTree_ptr(new ParseTree(name));
-
-				if (lastName==NULL)
-					quote = ParseTree_ptr(new ParseTree("\'()", newName));
-				else
-					lastName->brother = newName;
-
-				lastName = newName;
-			}
-
-			if (lastName==NULL)
-				quote = ParseTree_ptr(new ParseTree("\'()"));
-
+			ParseTree_ptr context( Parsing(code.substr(1))), quote;
+			if (code[0] == '\'')
+				quote = ParseTree_ptr( new ParseTree("\'", context) );
+			else
+				quote = ParseTree_ptr( new ParseTree("`", context));
 			return quote;
 		}
-		else // quasiquotation		`( ... )
-		{
-			// W.T.F.
-			throw syntaxError("quasiquotations are not available now");
-		}
+	}
+	else if ( code[0]==',' )
+	{
+		std::string sign, token;
+		ParseTree_ptr tree, subtree;
+		int pos = 0;
+
+		sign.clear();
+		sign.push_back(code[pos++]);
+		if (code[pos]=='@')
+			sign.push_back(code[pos++]);
+
+		subtree = ParseTree_ptr( Parsing( code.substr(pos) ) );
+		tree = ParseTree_ptr(new ParseTree(sign, subtree) );
+
+		return tree;
+
 	}
 	else if ( code[0]=='#' )
 	{
@@ -92,6 +89,12 @@ ParseTree_ptr Parsing(std::string code) // code should be refined first
 		else if ( code[1]=='\\' )
 		{
 			//char
+			
+			// ------lowercase-------
+			if (code_size>3)
+				for (int i=0; i<code_size; ++i)
+					code[i] = tolower(code[i]);
+
 			if (code_size==3 || ( code_size<10 && code == "#\\space" || code == "#\\tab" || code=="#\\newline" ))
 			{
 				ParseTree_ptr node( new ParseTree(code) );
@@ -145,11 +148,16 @@ ParseTree_ptr Parsing(std::string code) // code should be refined first
 			else
 				lastName->brother = newName;
 			lastName = newName;
+			if (name[0] == ',')
+			{
+				if ( !getToken( name, code, pos ) )
+					throw syntaxError("illegal use: \',\' or \',@\'");
+				lastName->son = Parsing(name);
+			}
 		}
 
 		if (lastName == NULL)
 			listToken = ParseTree_ptr( new ParseTree("()") );
-			//throw syntaxError("missing procedure expression");
 
 		return listToken;
 	}
@@ -170,6 +178,10 @@ ParseTree_ptr Parsing(std::string code) // code should be refined first
 	{
 		bool rationalFlag = false, realFlag = false, numbersFlag = true;
 		
+		// ------lowercase-------
+		for (int i=0; i<code_size; ++i)
+			code[i] = tolower(code[i]);
+
 		for (int pos = 0; pos<code_size; ++pos)
 		{
 			if ( code[pos]=='.' )
@@ -258,13 +270,24 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 
 		return true;
 	}
+	else if (code[pos]==',')					//comma or comma_at
+	{
+		name.push_back(code[pos++]);
+
+		while ( isspace(code[pos]) && pos<code_size-1 ) ++pos;
+
+		if (code[pos]=='@')
+			name.push_back(code[pos++]);
+
+		return true;
+	}
 	else if (code[pos]=='\'' || code[pos]=='`')	// quotation
 	{
 		quotation:
 		name.push_back(code[pos++]);
 		while ( isspace(code[pos]) && pos<code_size-1 ) ++pos;
 		
-		if (pos>=code_size-1 || code[pos]=='\'' || code[pos]=='`' || code[pos]==',' || code[pos]=='@' || code[pos]==')')
+		if (pos>=code_size-1 || /*code[pos]=='\'' || code[pos]=='`' || code[pos]==',' || code[pos]=='@' ||*/ code[pos]==')')
 			throw syntaxError("Illegal use of quotation");
 		
 		if (code[pos]=='\"')
@@ -319,7 +342,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 						break;
 				}
 				else
-					name.push_back(code[pos++]);
+					name.push_back( tolower(code[pos++]) );
 			}
 		}
 
@@ -327,30 +350,6 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 			throw syntaxError("Illegal list expression");
 
 		return true;
-	}
-	else if (code[pos]==',')					//comma or comma_at
-	{
-		name.push_back(code[pos++]);
-
-		while ( isspace(code[pos]) && pos<code_size-1 ) ++pos;
-
-		if (code[pos]=='@')
-			name.push_back(code[pos++]);
-
-		while ( isspace(code[pos]) && pos<code_size-1 ) ++pos;
-
-		if (pos>=code_size-1 || code[pos]==',' || code[pos]=='@' || code[pos]==')')
-			throw syntaxError("Illegal use of \',\'");
-
-		if (code[pos]=='\"')
-			goto doubleQuotation;
-		else if (code[pos]=='\'' || code[pos]=='`')
-			goto quotation;
-		else if (code[pos]=='(')
-			goto parentheses;
-		else
-			goto commonplace;
-
 	}
 	else if (code[pos]=='#')
 	{
@@ -372,7 +371,7 @@ bool getToken( std::string &name, const std::string &code, int &pos )
 			if (code[pos]=='(' || code[pos]==')' || code[pos]=='\'' || code[pos]=='`' || code[pos]=='\"' || code[pos]==',' || isspace(code[pos]))
 				break;
 			else
-				name.push_back(code[pos++]);
+				name.push_back( tolower(code[pos++]) );
 		}
 		return true;
 	}

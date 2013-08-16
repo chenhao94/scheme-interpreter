@@ -5,9 +5,9 @@
 #include "execute.h"
 #include <cctype>
 
-builtInSet builtInSyntax({ "if","cond","case","else","define","set!","lambda","quote","quasiquote" });
+builtInSet builtInSyntax({ "if","cond","case","else","define","set!","lambda","quote","quasiquote","and","or" });
 
-builtInSet builtInProcedure({"+","-","*","/","=","<",">","<=",">=","modulo","gcd","lcm","quotient","remainder","max","min","exact->inexact","inexact->exact","symbol?","string?","number?","bool?","list?","and","or","string=?","string<?","string>?","string<=?","string>=?","cons","car","cdr","eq?","eqv?","equal?"});
+builtInSet builtInProcedure({"+","-","*","/","=","<",">","<=",">=","modulo","gcd","lcm","quotient","remainder","max","min","exact->inexact","inexact->exact","symbol?","string?","number?","boolean?","list?","string=?","string<?","string>?","string<=?","string>=?","cons","car","cdr","eq?","eqv?","equal?"});
 
 Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 {
@@ -32,8 +32,12 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 		//----real--------
 		else
 			obj = Obj_ptr( new RealObj( bigReal(token) ) );
-		return obj;
+		return descend(obj);
 	}
+
+	//----comma--------
+	else if (token[0]==',')
+		throw syntaxError("unexpected comma here");
 
 	//----identifier----
 	else if (idenFlag)
@@ -48,7 +52,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 			env_ptr nullEnv(nullptr);
 			obj = Obj_ptr(new ProcedureObj(nullArg, nullTree, nullEnv, true, token));
 		}
-		return obj;
+		return descend(obj);
 	}
 
 	//----char&bool-----
@@ -66,7 +70,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 			else
 				obj = Obj_ptr( new CharObj(token[2]) );
 
-			return obj;
+			return descend(obj);
 		}
 		//----bool-----
 		else
@@ -77,7 +81,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 			else
 				obj = Obj_ptr( new BoolObj(false) );
 
-			return obj;
+			return descend(obj);
 		}
 	}
 
@@ -85,24 +89,20 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 	else if (token[0]=='\"')
 	{
 		obj = Obj_ptr( new StringObj(token.substr(1, token.size()-2)) );
-		return obj;
+		return descend(obj);
 	}
 
-	//----symbol-------
-	else if (token[0]=='\'')
+	//----quote-------
+	else if (token=="\'")
 	{
-		ParseTree_ptr context = root->getSon();
+		obj = Quote(root);
+		return descend(obj);
+	}
 
-		if (token=="\'()") // list
-		{
-			obj = makeList(context);
-			return obj;
-		}
-		else	//	symbol
-		{
-			obj = Obj_ptr( new SymbolObj( context->getToken() ) );
-			return obj;
-		}
+	else if (token=="`")
+	{
+		obj = Quasiquote(root, env);
+		return descend(obj);
 	}
 
 	//----syntax&procedure----
@@ -118,7 +118,7 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 		//--------syntax------------
 		if (builtInSyntax.find(iden) != builtInSyntax.end())
 		{
-			return evaluateSyntax(iden, name->getBrother(), env);
+			return descend(evaluateSyntax(iden, name->getBrother(), env));
 		}
 		
 		//--------procedure---------
@@ -163,11 +163,11 @@ Obj_ptr evaluate(const ParseTree_ptr &root, env_ptr & env)
 
 		if (obj)	//define by user
 		{
-			return evaluateUserDefined(obj, head, env);
+			return descend(evaluateUserDefined(obj, head, env));
 		}
 		else		// built-in
 		{
-			return evaluateBuiltInProcedure(iden, head, env);
+			return descend(evaluateBuiltInProcedure(iden, head, env));
 		}
 
 	}
@@ -187,7 +187,7 @@ Obj_ptr findIden(env_ptr env, const std::string &name)
 	{
 		obj = env->FindObj(name);
 		if (obj!=nullptr)
-			return obj;
+			return descend(obj);
 		env = env->next;
 	}
 	return nullptr;
@@ -257,14 +257,14 @@ void checkToken(const std::string &token, bool &numberFlag, bool &rationalFlag, 
 	return;
 }
 
-Obj_ptr makeList(const ParseTree_ptr & tree)
+Obj_ptr quoteMakeList(const ParseTree_ptr & tree)
 {
 	Obj_ptr obj;
 
 	if (tree==nullptr)
 	{
 		obj = Obj_ptr( new PairObj(nullptr, nullptr) );
-		return obj;
+		return descend(obj);
 	}
 
 	std::string token = tree->getToken();
@@ -273,13 +273,161 @@ Obj_ptr makeList(const ParseTree_ptr & tree)
 	{
 		if (tree->getBrother() == nullptr || tree->getBrother()->getBrother() != nullptr)
 			throw syntaxError("illegal use: \'.\'");
-		obj = Obj_ptr( new SymbolObj(tree->getBrother()->getToken()) );
+		return Quote(tree->getBrother());
 	}
 	else
 	{
-		Obj_ptr o1( new SymbolObj(token) );
-		obj = Obj_ptr( new PairObj(o1, makeList(tree->getBrother())) );
+		Obj_ptr o1( Quote(tree) );
+		obj = Obj_ptr( new PairObj(o1, quoteMakeList(tree->getBrother())) );
 	}
-	return obj;
+	return descend(obj);
 }
 
+Obj_ptr quasiquoteMakeList(const ParseTree_ptr & tree, env_ptr & env)
+{
+	Obj_ptr obj;
+
+	if (tree==nullptr)
+	{
+		obj = Obj_ptr( new PairObj(nullptr, nullptr) );
+		return descend(obj);
+	}
+
+	std::string token = tree->getToken();
+
+	if (token==".")
+	{
+		if (tree->getBrother() == nullptr || tree->getBrother()->getBrother() != nullptr)
+			throw syntaxError("illegal use: \'.\'");
+		return Quasiquote(tree->getBrother(), env);
+	}
+	else
+	{
+		Obj_ptr o1( Quasiquote(tree, env) );
+		obj = Obj_ptr( new PairObj(o1, quasiquoteMakeList(tree->getBrother(), env)) );
+	}
+	return descend(obj);
+}
+
+Obj_ptr Quote(const ParseTree_ptr &root)
+{
+	if (root == nullptr)
+		return nullptr;
+	std::string token = root->getToken();
+	bool numberFlag = true, rationalFlag = false, realFlag = false, idenFlag = true;
+
+	checkToken(token, numberFlag, rationalFlag, realFlag, idenFlag);
+
+	if ( numberFlag==true )		// numerical constant
+	{
+		//----integer-----
+		if (!rationalFlag && !realFlag)
+			return Obj_ptr( new IntegerObj( bigInteger(token) ) );
+		//----rational----
+		else if (rationalFlag)
+			return Obj_ptr( new RationalObj( bigRational(token) ) );
+		//----real--------
+		else
+			return Obj_ptr( new RealObj( bigReal(token) ) );
+	}
+	else if (token[0]=='\"')	// string constant
+		return Obj_ptr( new StringObj(token.substr(1, token.size()-2)) );
+	else if (token[0]=='#')
+	{
+		// character constant
+		if (token[1]=='\\')
+		{
+			if (token=="#\\newline")
+				return Obj_ptr( new CharObj('\n') );
+			else if (token=="#\\space")
+				return Obj_ptr( new CharObj(' ') );
+			else if (token=="#\\tab")
+				return Obj_ptr( new CharObj('\t') );
+			else
+				return Obj_ptr( new CharObj(token[2]) );
+		}
+		// boolean constant
+		else
+		{
+			if (token[1]=='t')
+				return Obj_ptr( new BoolObj(true) );
+			else
+				return Obj_ptr( new BoolObj(false) );
+		}
+	}
+	else if (token=="\'")
+		return Quote(root->getSon());
+	else if (token=="`")
+		throw syntaxError("unexpected \'`\' here");	
+	else if (token=="()")
+		return quoteMakeList(root->getSon());
+	else if (token[0]==',')
+		throw syntaxError("unexpected comma here");	
+	else
+		return Obj_ptr( new SymbolObj( token ) );
+}
+
+Obj_ptr Quasiquote(const ParseTree_ptr &root, env_ptr & env)
+{
+	if (root == nullptr)
+		return nullptr;
+	std::string token = root->getToken();
+	bool numberFlag = true, rationalFlag = false, realFlag = false, idenFlag = true;
+
+	checkToken(token, numberFlag, rationalFlag, realFlag, idenFlag);
+
+	if ( numberFlag==true )		// numerical constant
+	{
+		//----integer-----
+		if (!rationalFlag && !realFlag)
+			return Obj_ptr( new IntegerObj( bigInteger(token) ) );
+		//----rational----
+		else if (rationalFlag)
+			return Obj_ptr( new RationalObj( bigRational(token) ) );
+		//----real--------
+		else
+			return Obj_ptr( new RealObj( bigReal(token) ) );
+	}
+	else if (token[0]=='\"')	// string constant
+		return Obj_ptr( new StringObj(token.substr(1, token.size()-2)) );
+	else if (token[0]=='#')
+	{
+		// character constant
+		if (token[1]=='\\')
+		{
+			if (token=="#\\newline")
+				return Obj_ptr( new CharObj('\n') );
+			else if (token=="#\\space")
+				return Obj_ptr( new CharObj(' ') );
+			else if (token=="#\\tab")
+				return Obj_ptr( new CharObj('\t') );
+			else
+				return Obj_ptr( new CharObj(token[2]) );
+		}
+		// boolean constant
+		else
+		{
+			if (token[1]=='t')
+				return Obj_ptr( new BoolObj(true) );
+			else
+				return Obj_ptr( new BoolObj(false) );
+		}
+	}
+	else if (token=="\'")
+		return Quote(root->getSon());
+	else if (token=="`")
+		return Quasiquote(root->getSon(), env);
+	else if (token=="()")
+		return quasiquoteMakeList(root->getSon(), env);
+	else if (token==",")
+		return evaluate(root->getSon(), env);
+	else if (token==",@")
+	{
+		Obj_ptr obj(evaluate(root->getSon(), env));
+		if (!isList(obj))
+			throw syntaxError("there must be a list after \',@\'");	//W.T.F.
+		throw syntaxError("sorry for no support of \',@\' now");
+	}
+	else
+		return Obj_ptr( new SymbolObj( token ) );
+}

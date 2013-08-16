@@ -625,3 +625,31 @@ Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	return ptr;
 }
 
+Obj_ptr descend (const Obj_ptr &aPtr)
+{
+	//if (aPtr == nullptr || aPtr->Type != Number )
+		return aPtr;
+
+	NumberType Type = static_cast<NumberObj*>(aPtr.get())->numType;
+
+	if (Type == Integer)
+		return aPtr;
+	else if (Type == Rational)
+	{
+		bigRational value( static_cast<RationalObj*>(aPtr.get())->getValue() );
+		value.canonicalize();
+		if (value.get_den() == 1)
+			return Int_ptr( new IntegerObj(value.get_num()) );
+		else
+			return aPtr;
+	}
+	else if (Type == Real)
+	{
+		bigReal value( static_cast<RealObj*>(aPtr.get())->getValue() );
+		if (mpf_integer_p(value.get_mpf_t())!=0)
+			return Int_ptr(new IntegerObj( realToInt(value) ));
+		return aPtr;
+	}
+
+	return aPtr;
+}

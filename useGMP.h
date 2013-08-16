@@ -17,5 +17,7 @@ bigInteger countGCD(const bigInteger &, const bigInteger &);
 
 bigInteger countLCM(const bigInteger &, const bigInteger &);
 
+bigInteger realToInt(const bigReal &r);
+
 #endif
 

@@ -19,6 +19,8 @@ The followings are available in the interpreter now.
 * define
 * set!
 * lamdba
+* and, or
+* quote, quasiquote(expect ',@')
 
 ##Procedure
 The followings are available in the interpreter now.
@@ -30,7 +32,6 @@ The followings are available in the interpreter now.
 * gcd, lcm
 * eq?, eqv?, equal?
 * cons, car, cdr
-* and, or
 * symbol?, string?, number?, bool?, list?
 * string=?, string<?, string>?, string<=?, string>=?
 

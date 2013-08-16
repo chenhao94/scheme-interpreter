@@ -14,7 +14,7 @@ int main()
 	string tmp;
 	string cache, sentence;
 	Obj_ptr obj;
-	ParseTree_ptr tree = NULL;
+	ParseTree_ptr tree = nullptr;
 	env_ptr env(new Environment() );
 
 	cout << "Welcome to CH's Scheme Interpreter!!" << endl;
@@ -37,7 +37,7 @@ int main()
 				extract(sentence, cache, cacheEndFlag);
 				tree = Parsing(sentence);
 				obj = evaluate(tree, env);
-				if (obj != NULL)
+				if (obj != nullptr)
 					cout << obj->ExternalRep() << endl;
 			}
 			catch (syntaxError err)

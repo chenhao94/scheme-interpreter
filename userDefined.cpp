@@ -41,7 +41,13 @@ Obj_ptr evaluateUserDefined( const Obj_ptr &func, const Para_ptr & para, env_ptr
 		throw syntaxError("too much arguments");
 	//----end of check-------------------------
 	
-	return evaluate(static_cast<ProcedureObj*>(func.get())->getBody(), newEnv);
+	ParseTree_ptr body = static_cast<ProcedureObj*>(func.get())->getBody();
+	while (body->getBrother())
+	{
+		evaluate(body, newEnv);
+		body = body->getBrother();
+	}
+	return evaluate(body, newEnv);
 }
 
 Obj_ptr makeList(const Para_ptr & para)

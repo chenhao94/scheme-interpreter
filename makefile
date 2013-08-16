@@ -31,10 +31,10 @@ extract.o : extract.cpp extract.h
 	g++ extract.cpp -c -std=c++11 -lgmp -lgmpxx -g
 
 parseTreePrinter : parseTreePrinter.o parse.o
-	g++ parseTreePrinter.o parse.o -lm -lgmp -lgmpxx -std=c++11 -o parseTreePrinter
+	g++ parseTreePrinter.o parse.o -lm -lgmp -lgmpxx -std=c++11 -o parseTreePrinter -g
 
 parseTreePrinter.o : parseTreePrinter.cpp parse.h 
-	g++ parseTreePrinter.cpp -c -lgmp -lgmpxx -std=c++11
+	g++ parseTreePrinter.cpp -c -lgmp -lgmpxx -std=c++11 -g
 	
 clear: 
 	rm *.o *~ main parseTreePrinter

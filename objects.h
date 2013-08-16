@@ -74,6 +74,7 @@ Obj_ptr LCM (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Not (const Obj_ptr &aPtr);
 Obj_ptr And (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
 Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr);
+Obj_ptr descend (const Obj_ptr &aPtr);
 
 template <class T, class U = typename T::__ObjectBaseType>
 bool operator==(const T &a, const T &b)
