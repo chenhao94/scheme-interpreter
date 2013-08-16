@@ -1,0 +1,14 @@
+Welcome to CH's scheme interpreter!!
+
+Author: Hao Chen (http://github.com/chenhao94)
+
+Options:
+
+	-i <files>   ---------------   Import the following files
+
+	--help       ---------------   Display this information
+
+	<nothing>    ---------------   Run the interpreter directly
+
+To fork this interpreter, go to the repository (http://github.com/chenhao94/scheme-interpreter)
+

@@ -1,9 +1,10 @@
 main : 	error.h useGMP.o objects.o environments.o parse.o \
 	execute.o builtIn.o userDefined.o extract.o display.o \
-	main.o parseTreePrinter
+	Help.o Import.o main.o parseTreePrinter
 	g++ main.o useGMP.o objects.o environments.o parse.o \
 		execute.o builtIn.o userDefined.o extract.o      \
-		display.o -lm -std=c++11 -lgmp -lgmpxx -o main -g
+		display.o Help.o Import.o -lm -std=c++11 -lgmp   \
+		-lgmpxx -o main -g
 
 main.o : main.cpp extract.h parse.h execute.h error.h
 	g++ main.cpp -c -std=c++11 -lgmp -lgmpxx -g
@@ -34,6 +35,12 @@ extract.o : extract.cpp extract.h
 
 display.o : display.cpp display.h
 	g++ display.cpp -c -std=c++11 -lgmp -lgmpxx -g
+
+Help.o : Help.cpp Help.h
+	g++ Help.cpp -c -std=c++11 -lgmp -lgmpxx -g
+
+Import.o : Import.cpp Import.h
+	g++ Import.cpp -c -std=c++11 -lgmp -lgmpxx -g
 
 parseTreePrinter : parseTreePrinter.o parse.o
 	g++ parseTreePrinter.o parse.o -lm -lgmp -lgmpxx -std=c++11 -o parseTreePrinter -g

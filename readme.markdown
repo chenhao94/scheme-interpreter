@@ -32,6 +32,17 @@ And you will see
 	Welcome to CH's scheme Interpreter!!
 	> 
 
+You can also learn more options by
+
+	./main --help
+
+Run the parse tree printer
+
+	./parseTreePrinter
+
+Then you can input a LEGAL sentence in ONE line, then you will see what the parse tree looks like
+
+
 Enjoy it!
 
 
@@ -63,6 +74,8 @@ The followings are available in the interpreter now.
 * append
 * apply
 * display
+
+Some of other procedures are defined in "./lib/stdlib.scm".
 
 ##Postscript
 According to the requirement, the interpreter is programmed individually, but there are some inspiring talks with Zhuoyue Zhao, my classmate.
