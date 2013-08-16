@@ -561,7 +561,7 @@ Obj_ptr Modulo (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 	NumberType aT( static_cast<NumberObj*>(aa)->numType ),
 			   bT( static_cast<NumberObj*>(bb)->numType );
 	if (aT != Integer || bT != Integer)
-		throw syntaxError("Unexpected type");
+		throw syntaxError("Unexpected type: 1");
 
 	IntegerObj *a(static_cast<IntegerObj*>(aa)), *b(static_cast<IntegerObj*>(bb));
 
@@ -655,7 +655,7 @@ Obj_ptr Or (const Obj_ptr &aPtr, const Obj_ptr &bPtr)
 
 Obj_ptr descend (const Obj_ptr &aPtr)
 {
-	//if (aPtr == nullptr || aPtr->Type != Number )
+	if (aPtr == nullptr || aPtr->Type != Number )
 		return aPtr;
 
 	NumberType Type = static_cast<NumberObj*>(aPtr.get())->numType;
