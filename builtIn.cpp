@@ -35,13 +35,16 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	else if (name=="-")
 	{
 		Para_ptr now = para, last;
-		Obj_ptr ans;
+		Obj_ptr ans(new IntegerObj(0));
 
 		if (now == nullptr)
 			throw syntaxError("at least one arugument");
 
 		if (now->obj->Type != Number)
 			throw syntaxError("unexpected type");
+
+		if (now->next == nullptr)
+			return Subtract(ans, now->obj);
 
 		ans = now->obj;
 		last = now;
@@ -83,13 +86,16 @@ Obj_ptr evaluateBuiltInProcedure(const std::string &name, const Para_ptr &para, 
 	else if (name=="/")
 	{
 		Para_ptr now = para, last;
-		Obj_ptr ans;
+		Obj_ptr ans(new IntegerObj(1));
 
 		if (now == nullptr)
 			throw syntaxError("at least one arugument");
 
 		if (now->obj->Type != Number)
 			throw syntaxError("unexpected type");
+
+		if (now->next == nullptr)
+			return Divide(ans, now->obj);
 
 		ans = now->obj;
 		last = now;
