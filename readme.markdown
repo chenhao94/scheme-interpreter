@@ -40,8 +40,24 @@ Run the parse tree printer
 
 	./parseTreePrinter
 
-Then you can input a LEGAL sentence in ONE line, then you will see what the parse tree looks like
+Then you can input a LEGAL sentence in ONE line, then you will see what the parse tree looks like.
 
+E.g.
+
+	./parseTreePrinter
+	( + (if #t 1 2) 3)
+
+	()                                                                                                  
+	|                                                                                                   
+	|                                                                                                   
+	|                                                                                                   
+	|                                                                                                   
+	+ ------- () ------------------------------------ 3                                                 
+	          |                                                                                         
+	          |                                                                                         
+	          |                                                                                         
+	          |                                                                                         
+	          if ------ #t ------ 1 ------- 2    
 
 Enjoy it!
 
